@@ -116,13 +116,3 @@ fi
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
 	export XDG_CURRENT_DESKTOP=kde
 fi
-
-# Load ssh stuff.
-if [[ -z "${SSH_AGENT_PID}" ]] ; then 
-
-	# Load ssh-agent setting the needed env variable.
-	eval $(ssh-agent) > /dev/null
-	
-	# Load default ssh key into agent.
-	ssh-add
-fi
