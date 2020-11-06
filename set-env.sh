@@ -1,6 +1,6 @@
 #/bin/bash
 
-# Get the location to the C drive in the unoix environment.
+# Get the location to the C drive in the unix environment.
 if [[ -d "/cygdrive" ]] ; then
 	echo "Cygwin detected.."
 	C_DRIVE="/cygdrive/c"
