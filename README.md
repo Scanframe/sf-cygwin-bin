@@ -117,9 +117,9 @@ apt-cyg install rsync bash-completion joe mc xfce4-terminal xterm bash-completio
 Type `apt-cyg` for additional options when needed.
 
 # VcXsrv (X-server for Windows)
-<br/>
+
 ## Installing
-<br/>
+
 ### Download
 
 Goto the sourceforge [website](https://sourceforge.net/projects/vcxsrv/ "VcXsrv Windows X Server") and download the installer.
