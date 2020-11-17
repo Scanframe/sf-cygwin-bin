@@ -21,7 +21,6 @@ software tools, and data of the Unix-like environment. Thus it is possible to la
 as well as to use Cygwin tools and applications within the Windows operating context.
 
 ## Installing
-<br/>
 
 ### Downloading
 
@@ -51,11 +50,11 @@ db_home:  /cygdrive/c/Users/%u/cygwin
 # db_gecos: <empty>
 ```
 
-**Clone the Git 'bin' Enzo scripts repository**
+**Clone the Git 'bin-bash' shared scripts repository**
 
 Clone the bin dirtectory using this on the cygwin command-line.
 
- `git clone https://git.scanframe.com/enzo/bin-bash.git ~/bin`
+ `git clone https://git.scanframe.com/shared/bin-bash.git ~/bin`
 
 **Uncomment section in start script"
 
