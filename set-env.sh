@@ -9,14 +9,18 @@ else
 	C_DRIVE="/mnt/c"
 fi
 
-# Set the source drives.
-SRC_UNIX="${C_DRIVE}/Users/arjan/cygwin/src"
-SRC_WINDOWS="C:/Users/arjan/cygwin/src"
-
 # Make a copy of the original path to allow calling this script multiple times.
 if [[ -z ${PATH_ORG} ]] ; then
 	export PATH_ORG=${PATH}
 fi
+
+# Configuration Qt and Visual Studio
+if [[ ! -z "$1" ]] ; then
+
+# Set the source drives.
+SRC_UNIX="${C_DRIVE}/Users/arjan/cygwin/src"
+SRC_WINDOWS="C:/Users/arjan/cygwin/src"
+
 
 export CVSROOT=${SRC_WINDOWS}
 export QTDIR="${C_DRIVE}/Qt/5.12.4/msvc2017_64"
@@ -28,8 +32,15 @@ export PATH=${PATH_ORG}\
 ":${FEASTDIR}/bin"\
 ":${SRC_UNIX}/ExternalLibraries/KDSoap/1.8.0-msvc2017/bin"
 
-
-
 #alias cl="/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/Enterprise/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x86/cl.exe"
-
 alias vs="/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/Enterprise/Common7/IDE/devenv.exe"
+
+# Configuration for MingW 
+else
+
+export PATH="${PATH_ORG}"\
+":/cygdrive/p/Qt/Tools/CMake_64/bin"\
+":/cygdrive/p/Qt/Tools/mingw810_64/bin"\
+":/cygdrive/p/Qt/5.15.2/mingw81_64/bin"
+
+fi
