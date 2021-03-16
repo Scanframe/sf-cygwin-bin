@@ -41,6 +41,6 @@ else
 export PATH="${CYG_PATH_ORG}"\
 ":/cygdrive/p/Qt/Tools/CMake_64/bin"\
 ":/cygdrive/p/Qt/Tools/mingw810_64/bin"\
-":/cygdrive/p/Qt/5.15.2/mingw81_64/bin"
+":/cygdrive/p/Qt/6.0.1/mingw81_64/bin"
 
 fi

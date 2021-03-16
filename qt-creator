@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Change also the working directory to prevent error on VCRUNTIME_xx.DLL.
+cygstart --directory="${HOME}/lib/Qt/Tools/QtCreator/bin" qtcreator
