@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Change also the working directory to prevent error on VCRUNTIME_xx.DLL.
+
+cygstart --directory="/cygdrive/c/Program Files/JetBrains/CLion 2021.1/bin/" clion
