@@ -38,9 +38,21 @@ alias vs="/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/Ent
 # Configuration for MingW 
 else
 
+QTLIBDIR="$(qt-lib-dir.sh)"
+
+if [[ -z "${QTLIBDIR}" ]] ; then 
+
+echo "Qt library directory not found..."
+
+else
+
+echo "Qt library: ${QTLIBDIR}"
+
 export PATH="${CYG_PATH_ORG}"\
-":/cygdrive/p/Qt/Tools/CMake_64/bin"\
-":/cygdrive/p/Qt/Tools/mingw810_64/bin"\
-":/cygdrive/p/Qt/6.0.1/mingw81_64/bin"
+":$(realpath "${QTLIBDIR}/..")/Tools/CMake_64/bin"\
+":$(realpath "${QTLIBDIR}/..")/Tools/mingw810_64/bin"\
+":${QTLIBDIR}/mingw81_64/bin"
+
+fi
 
 fi
