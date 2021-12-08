@@ -26,9 +26,9 @@ echo "Qt library: ${QTLIBDIR}"
 
 # Put 'Tools/mingw810_64/bin' first so resource compiler "/usr/bin/windres" from cygwin is not selected.
 export PATH=\
-"$(realpath "${QTLIBDIR}/..")/Tools/mingw810_64/bin"\
+"$(realpath "${QTLIBDIR}/..")/Tools/mingw_64/bin"\
 ":${CYG_PATH_ORG}"\
 ":$(realpath "${QTLIBDIR}/..")/Tools/CMake_64/bin"\
-":${QTLIBDIR}/mingw81_64/bin"
+":${QTLIBDIR}/mingw_64/bin"
 
 fi
