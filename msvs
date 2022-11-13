@@ -1,5 +1,11 @@
 #!/bin/bash
 
-# Change also the working directory to prevent error on VCRUNTIME_xx.DLL.
+# shellcheck disable=SC2154
+MSVS_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/Microsoft Visual Studio/"*"/Community/Common"*"/IDE/")"
 
-cygstart --directory="$(cygpath "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe")"
+if [[ -d "${MSVS_BIN_DIR}" ]] ; then
+	cygstart --directory="${MSVS_BIN_DIR}" "devenv.exe"
+else
+	echo "Could not find 'Visual Studio' directory in '${ProgramW6432}/Microsoft Visual Studio/*/Community/Common*/IDE)' !"
+	exit 1
+fi
