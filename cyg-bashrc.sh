@@ -121,3 +121,20 @@ fi
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
 	export XDG_CURRENT_DESKTOP=kde
 fi
+
+# Load the ssh-agent and default key.
+source load-ssh-agent.sh
+
+# Only when started from mintty console application.
+if [[ "${TERM_PROGRAM}" == "mintty" ]] ; then
+
+	# Set the display for the X-server
+	export DISPLAY=:0.0
+
+	# set the needed environment variables for qmake and Visual Studio et cetera.
+	#source ~/bin/set-env.sh
+
+	# Start the X-server
+	source xserver-start.sh
+fi
+	
