@@ -1,5 +1,13 @@
-#!/bin/bash
-
 # Change also the working directory to prevent error on VCRUNTIME_xx.DLL.
 
-cygstart --directory="/cygdrive/c/Program Files/JetBrains/CLion 2021.1/bin/" clion
+# shellcheck disable=SC2154
+CLION_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/JetBrains/CLion"*/bin)"
+
+export PATH="${PATH}:${CLION_BIN_DIR}/mingw/bin"
+
+if [[ -d "${CLION_BIN_DIR}" ]] ; then
+	cygstart --directory="${CLION_BIN_DIR}" clion64.exe
+else
+	echo "Could not find CLion directory in '${ProgramW6432}/JetBrains/CLion\*/bin/)' !"
+	exit 1
+fi
