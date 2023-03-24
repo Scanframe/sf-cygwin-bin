@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+if [ $# -ne 1 ] ; then
+	ssh --help
+	exit 1
+fi
+
+
+ssh $* -t "DISPLAY=192.168.56.1:0.0 /bin/bash -c 'source ~/.profile && /bin/bash'"
+
