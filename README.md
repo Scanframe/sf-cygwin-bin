@@ -58,7 +58,7 @@ db_home:  /cygdrive/c/Users/%u/cygwin
 Clone the bin directory using this on the cygwin command-line.
 
 ```bash
-git clone https://git.scanframe.com/shared/bin-bash.git ~/bin
+git clone https://github.com/Scanframe/sf-cygwin-bin ~/bin
 ```
 
 **Uncomment section in start script**
