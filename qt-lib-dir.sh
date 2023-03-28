@@ -20,7 +20,7 @@ function GetLocalQtDir()
 	local LocalQtDir=""
 	# Check is the Qt install can be found.
 	if [[ ! -d "${LOCAL_QT_ROOT}" ]] ; then
-		WriteLog "Qt install directory or symbolic link '${LOCAL_QT_ROOT}' was not found!"
+		#WriteLog "Qt install directory or symbolic link '${LOCAL_QT_ROOT}' was not found!"
 		exit 1
 	fi
 	# Find the newest Qt library installed.

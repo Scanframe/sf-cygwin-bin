@@ -1,11 +1,14 @@
 #!/bin/bash
 
-
+# Bailout when no arguments are passed.
 if [ $# -ne 1 ] ; then
 	ssh --help
 	exit 1
 fi
 
+# Get the VirtualBox Adapters IP address.
+IP_HOST_ONLY="$(ipconfig /all | grep "VirtualBox Host-Only Ethernet Adapter" -A 4 | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
 
-ssh $* -t "DISPLAY=192.168.56.1:0.0 /bin/bash -c 'source ~/.profile && /bin/bash'"
+# Run the ssh command passing the DISPLAY environment variable.
+ssh $* -t "DISPLAY=${IP_HOST_ONLY}:0.0 /bin/bash -c 'source ~/.profile && /bin/bash'"
 

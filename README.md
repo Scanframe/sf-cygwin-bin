@@ -7,28 +7,31 @@ Usually put in the `~/bin` directory, which is the users home directory in a cyg
 # Installing Cygwin (Bash for windows)
 
 ## General
-Cygwin is a POSIX-compatible environment that runs natively on Microsoft Windows. 
-Its goal is to allow programs of Unix-like systems to be recompiled and run natively on 
+
+Cygwin is a POSIX-compatible environment that runs natively on Microsoft Windows.
+Its goal is to allow programs of Unix-like systems to be recompiled and run natively on
 Windows with minimal source code modifications by providing them with the same underlying POSIX API they would expect in those systems.
 
-The Cygwin installation directory behaves like the root and follows a similar directory layout to that found in Unix-like 
-systems, with familiar directories like /bin, /home, /etc, /usr, /var available within it, and includes by default hundreds of 
-programs and command-line tools commonly found in the Unix world, plus the terminal emulator Mintty 
+The Cygwin installation directory behaves like the root and follows a similar directory layout to that found in Unix-like
+systems, with familiar directories like /bin, /home, /etc, /usr, /var available within it, and includes by default hundreds of
+programs and command-line tools commonly found in the Unix world, plus the terminal emulator Mintty
 which is the default command-line interface tool provided to interact with the environment.
 
-Cygwin provides native integration of Windows-based applications, data, and other system resources with applications, 
-software tools, and data of the Unix-like environment. Thus it is possible to launch Windows applications from the Cygwin environment, 
+Cygwin provides native integration of Windows-based applications, data, and other system resources with applications,
+software tools, and data of the Unix-like environment. Thus, it is possible to launch Windows applications from the Cygwin environment,
 as well as to use Cygwin tools and applications within the Windows operating context.
 
 ## Installing
 
 ### Downloading
 
-Goto the Cygwin [website](https://www.cygwin.com/ "Link to cygwin website.") and download the appropriate 32 or 64 bit version of Cygwin.
-
-Run the Installer and install it in the default location for "all users". Use a nearby proxy for downloading the packages.
-
-Select the following needed packages:
+Goto the Cygwin [website](https://www.cygwin.com/ "Link to cygwin website.") and download 64 bit version of Cygwin.
+Run the Cygwin **Setup** executable from a dedicated directory like `C:\Users\<home-dir>\lib\Cygwin-Setup` since it stores cached files 
+in the same directory. The setup could be run multiple times to install additional packages. 
+Run the Installer and install it in the default location (`C:\cygwin64`) for all users. 
+Use a nearby proxy for fast downloading the packages.
+ 
+Select the following initial needed packages using the Setup application:
 * wget
 * openssh
 * git
@@ -39,7 +42,7 @@ Missing a package for a command look it up [here](https://cygwin.com/cgi-bin2/pa
 
 **Set the cygwin users home directory to the Windows users directory**
 
-Edit the file `/etc/nsswitch.conf` or from Windows using `C:\<cygwin-dir>\etc\nsswitch.conf` and set the line  with `db_home` as shown.
+Edit the file `/etc/nsswitch.conf` or from Windows using `C:\<cygwin-dir>\etc\nsswitch.conf` and set the line with `db_home` as shown.
 
 ```bash
 # passwd:   files db
@@ -52,11 +55,13 @@ db_home:  /cygdrive/c/Users/%u/cygwin
 
 **Clone the Git 'bin-bash' shared scripts repository**
 
-Clone the bin dirtectory using this on the cygwin command-line.
+Clone the bin directory using this on the cygwin command-line.
 
- `git clone https://git.scanframe.com/shared/bin-bash.git ~/bin`
+```bash
+git clone https://git.scanframe.com/shared/bin-bash.git ~/bin
+```
 
-**Uncomment section in start script"
+**Uncomment section in start script**
 
 This next section is commented out in `.bash_profile` which need uncommenting.
 
@@ -110,10 +115,15 @@ apt-cyg install psmisc
 Now install the 'needed' multiple packages to easier use :
 
 ```bash
-apt-cyg install rsync bash-completion joe mc xfce4-terminal xterm bash-completion subversion
+apt-cyg install rsync bash-completion joe mc bash-completion subversion
 ```
 
 Type `apt-cyg` for additional options when needed.
+
+> **Note**  
+> Latest Cygwin version the `apt-cyg` script does not install all library dependencies somehow.
+> So run the Cygwin Setup again.
+
 
 # VcXsrv (X-server for Windows)
 
@@ -127,28 +137,9 @@ Run the installer with all defaults.<br/>
 Start the X-server using the command `xserver-start.sh` from the cygwin shell.<br/>
 In the Windows system tray an X-icon mst be visible.<br/>
 
-### Running Xfce Terminal
+### Additional Terminal Window
 
-Install package for the `xfce4-terminal` using the following command:
-
- ```bash
- apt-cyg install xfce4-terminal
- ```
-
-Then start it using the script called `terminal` and add a `&` to make it run the background.<br/>
-Use `Ctrl+Shift+T` to create a terminal tab which can be controlled with  `Ctrl+PgUp` en `Ctrl+PgUp`.<br/>
-To close a tab use `Ctrl+D`.
-
-### Running Xterm
-
-Install package for the `xterm` using the following command:
-
-```bash
-apt-cyg install xterm
-```
-
-Then start it using the script called `xterm.sh` and add a `&` to make it run the background.<br/>
-And `xterm` can be run multiple times to create multiple command shells.
+Call the `terminal` to open a secondary Cygwin terminal from an existing terminal.
 
 # Personal SSH Key
 
@@ -164,7 +155,8 @@ ssh-keygen -t rsa -C <email-address>
 ```
 
 The key is saved in the `~/.ssh` subdirectory using 2 files:
-* id_rsa (private with pass frase encrypted key) 
+
+* id_rsa (private with pass frase encrypted key)
 * id_rsa.pub (public key for on remote systems)
 
 Now the key is generated call `ssh-add` to add it to the already runing `ssh-agent` which was started in the `.bashrc` of cygwin.<br/>
@@ -173,6 +165,7 @@ Also when cygwin is restarted you're asked to enter your pass phrase because the
 Check if the key is loaded using `ssh-add -L`.
 
 ## Access Remote
+
 Drop your public key on a remote system to access itr without passing a password.<br/>
 When having access to a system with username and password then you can add the key to the file `~/.ssh/authorized_keys` like this.
 
@@ -204,7 +197,7 @@ Add the following content to the file `~/.ssh/config`.
 Host *
         ForwardAgent yes
         IdentityFile ~/.ssh/id_rsa
-```	
+```
 
 ### Port Tunneling
 
@@ -219,3 +212,21 @@ ssh -f -N -L 0.0.0.0:3307:localhost:3306 <username>@<remote-host>
 ```
 
 Now a mysql client can open a connection on the remote using localhost:3307.
+
+### Use X-Server from VirtualBox VM
+
+The `xssh` will find the host only adapter IP-address to pass in the `DISPLAY` environment variable to the bash shell.
+
+```bash
+# Run the ssh command passing the DISPLAY environment variable.
+ssh $* -t "DISPLAY=${IP_HOST_ONLY}:0.0 /bin/bash -c 'source ~/.profile && /bin/bash'"
+```
+
+To connect to the virtual machine VM use `xssh` like `xssh user@linux-vm-ip`.  
+To make it easier to remember which IP for which virtual machine edit the `/etc/hosts` 
+file from within the Cygwin terminal.  
+The `sudo` command will use the elevation function from Windows.
+
+```bash
+sudo joe /etc/hosts
+```

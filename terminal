@@ -1,14 +1,8 @@
 #/bin/bash
 
 which xfce4-terminal 2> /dev/null
-
 if [[ $? -eq 0 ]] ; then
-
 	xfce4-terminal 2> /dev/null &
-
 else
-
 	mintty 2> /dev/null &
-
-
 fi

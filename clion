@@ -1,13 +1,17 @@
-# Change also the working directory to prevent error on VCRUNTIME_xx.DLL.
+#!/bin/bash
 
-# shellcheck disable=SC2154
-CLION_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/JetBrains/CLion"*/bin)"
-
-export PATH="${PATH}:${CLION_BIN_DIR}/mingw/bin"
-
+# Check if CLion is installed in the users 'lib' directory.
+CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
+# Check if CLion is installed in users 'lib' directory.
+if [[ -z "${CLION_BIN_DIR}" ]]; then
+	# shellcheck disable=SC2154
+	CLION_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/JetBrains/CLion"*/bin 2> /dev/null)"
+fi
+# Check if the CLion directory exists.
 if [[ -d "${CLION_BIN_DIR}" ]] ; then
+	export PATH="${PATH}:${CLION_BIN_DIR}/mingw/bin"
 	cygstart --directory="${CLION_BIN_DIR}" clion64.exe
 else
-	echo "Could not find CLion directory in '${ProgramW6432}/JetBrains/CLion\*/bin/)' !"
+	echo "Could not find a CLion directory!"
 	exit 1
 fi
