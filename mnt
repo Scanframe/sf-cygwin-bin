@@ -1,0 +1,187 @@
+#!/bin/bash
+#set -x
+
+# Get the script directory.
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Application to execute for 'sudo'.
+if [[ -z "${DISPLAY}" ]]; then
+	exec_sudo=sudo
+else
+	exec_sudo=kdesudo
+fi
+
+# Writes to stderr.
+#
+function WriteLog()
+{
+	echo "$@" 1>&2; 
+}
+
+# Prints the help to stderr.
+#
+function ShowHelp()
+{
+	WriteLog  "Mounts named remotes as drives."
+	WriteLog  "Usage: $(basename -- "$0") <mount|umount|show> <source>"
+	WriteLog -en "Source options: all"
+	for opt in $(declare -F | grep "^declare -f Mount_" | sed "s/^declare -f Mount_//"); do
+		WriteLog -en ", $opt"
+	done
+	WriteLog -e "\n"
+	#read -n1 -r -p "Press any key to continue..."
+}
+
+# Checks if drive is mounted.
+#
+function DriveMounted()
+{
+	if test -d  "/cygdrive/$1" ; then
+		return 1
+	fi
+	return 0
+}
+
+# Returns the full mount drive.
+#
+function GetMountDrive()
+{
+	local index drives
+	index=0
+	drives="klmnopxy"
+	for opt in $(declare -F | grep "^declare -f Mount_" | sed "s/^declare -f Mount_//"); do
+		if [[ "${opt}" == "$1" ]]; then
+			echo "${drives:$index:1}"
+			return 
+		else
+			index=$((index+1))
+		fi
+	done
+}
+
+# Returns the full mount directory 
+# $2 = Mount name.
+#
+function GetMountPath()
+{
+	echo "/cygdrive/$(GetMountDrive "$1")"
+}
+
+# Options to use.
+OPTS="allow_root,reconnect,follow_symlinks,transform_symlinks,compression=no" 
+OPTS_IPV4="ssh_command=ssh -4"
+OPTS_IDS="idmap=user,uid=$(id -u),gid=$(id -g)"
+#ServerAliveInterval=15,ServerAliveCountMax=3,ciphers=aes128-ctr,"
+
+# Include file containing mount functions.
+mounts_file="${BASH_SOURCE[0]}.mounts"
+# Check if the file exists
+if [[ -f "${mounts_file}" ]]; then 
+	source "${mounts_file}"
+else	
+	# When not create one.
+	echo "Creating: ${mounts_file}"
+	cat << 'EOF' > "${mounts_file}"
+
+# Named mounting function example
+function Mount_example() 
+{
+	sshfs super@kubuntu: "$1:" -o "${OPTS},${OPTS_IDS},${OPTS_IPV4}" ;
+}
+
+EOF
+fi 
+
+# Displays all mounted points.
+#
+function ShowMounted
+{
+	WriteLog "Showing all possible sources and mount status:"
+	# Iterate through all possible mount points.
+	for opt in $(declare -F | grep "^declare -f Mount_" | sed "s/^declare -f Mount_//"); do
+		# Get the full mount directory.
+		local drive
+		drive="$(GetMountDrive "$opt")"
+		local white
+		white='\033[1;37m'
+		# No Color
+		local nc='\033[0m' 
+		# Check if directory is mounted.
+		DriveMounted "${drive}"
+		# ARM Linux returns 32 and not 1 as on 868 machines.
+		if [[ $? -eq 0 ]]; then
+			local sign="( )"
+			local color="${nc}"
+		else
+			local sign="(*)"
+			local color="${white}"
+		fi
+		WriteLog -e "${color}$(echo -e "${opt}\t${sign}" | expand -t 16) /cygdrive/${drive}${nc}"
+	done
+}		
+
+# Mounts the passed mounting command 
+# $1 = Mount name.
+#
+function DirectoryFuseMount()
+{
+	local drive
+	drive="$(GetMountDrive "$1")"
+	# Check if directory is mounted.
+	DriveMounted "${drive}"
+	if [[ $? -eq 0 ]]; then
+		WriteLog "Mounting '$1' on drive '${drive}'"
+		"Mount_$1" "${drive}"
+	else
+		WriteLog "Already mounted: ${drive}"
+	fi
+}
+
+# Unmounts the passed directory.
+# $1 = Mount name.
+#
+function DirectoryFuseUnmount()
+{
+	local dir drive
+	drive="$(GetMountDrive "$1")"
+	dir="$(GetMountPath "$1")"
+	# Check if drive is already mounted.
+	DriveMounted "${drive}"
+	if [[ $? -eq 0 ]]; then
+		WriteLog "Already unmounted: ${dir}"
+	else	
+		WriteLog "Unmounting: ${dir}"
+		fusermount -u "${dir}" > /dev/null
+	fi
+}
+
+	
+# Check if mounted points should be displayed.
+if [[ "$1" == "show" ]] ; then
+	ShowMounted
+	exit 0
+fi
+	
+# Check what to mount or unmount.
+if [[ "$2" = "all" ]]; then
+	MOUNTS=("kubuntu" ) 
+	for MOUNT in "${MOUNTS[@]}"; do
+		if [[ "$1" = "mount" ]]; then
+			DirectoryFuseMount "${MOUNT}"
+		elif [[ "$1" = "umount" ]]; then
+			DirectoryFuseUnmount "${MOUNT}"
+		fi
+	done
+elif [[ "$2" = "x&&ll" ]]; then
+	# Sudo the same script passing the home dir and user ID.
+	$exec_sudo "${0}" "${HOMEDIR}" "${USERID}" $*
+# Check if the mount function exists
+elif type "Mount_$2" &>/dev/null ; then
+	if [[ "$1" = "mount" ]]; then
+		DirectoryFuseMount "$2"
+	elif [[ "$1" = "umount" ]]; then
+		DirectoryFuseUnmount "$2"
+	fi
+else
+	ShowHelp
+fi
