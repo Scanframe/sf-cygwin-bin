@@ -109,7 +109,7 @@ To find a certain command/application for cygwin use the package finder [here](h
 So installing the `killall` command you need to install the `psmisc` package like this:
 
 ```bash
-apt-cyg install psmisc
+apt-cyg install psmisc procps-ng
 ```
 
 Now install the 'needed' multiple packages to easier use :

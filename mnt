@@ -23,10 +23,10 @@ function WriteLog()
 function ShowHelp()
 {
 	WriteLog  "Mounts named remotes as drives."
-	WriteLog  "Usage: $(basename -- "$0") <mount|umount|show> <source>"
-	WriteLog -en "Source options: all"
+	WriteLog  "Usage: $(basename -- "$0") <mount|umount|show> <source-name>"
+	WriteLog -en "Named sources to mount:"
 	for opt in $(declare -F | grep "^declare -f Mount_" | sed "s/^declare -f Mount_//"); do
-		WriteLog -en ", $opt"
+		WriteLog -en " $opt"
 	done
 	WriteLog -e "\n"
 	#read -n1 -r -p "Press any key to continue..."
@@ -163,20 +163,7 @@ if [[ "$1" == "show" ]] ; then
 fi
 	
 # Check what to mount or unmount.
-if [[ "$2" = "all" ]]; then
-	MOUNTS=("kubuntu" ) 
-	for MOUNT in "${MOUNTS[@]}"; do
-		if [[ "$1" = "mount" ]]; then
-			DirectoryFuseMount "${MOUNT}"
-		elif [[ "$1" = "umount" ]]; then
-			DirectoryFuseUnmount "${MOUNT}"
-		fi
-	done
-elif [[ "$2" = "x&&ll" ]]; then
-	# Sudo the same script passing the home dir and user ID.
-	$exec_sudo "${0}" "${HOMEDIR}" "${USERID}" $*
-# Check if the mount function exists
-elif type "Mount_$2" &>/dev/null ; then
+if type "Mount_$2" &>/dev/null ; then
 	if [[ "$1" = "mount" ]]; then
 		DirectoryFuseMount "$2"
 	elif [[ "$1" = "umount" ]]; then
