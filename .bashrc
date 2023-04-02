@@ -185,19 +185,25 @@
 #
 # alias cd=cd_func
 
+
 # Include bash from Ubuntu distro.
 source ~/bin/cyg-bashrc.sh
 
 # Load the ssh-agent and default key.
 source ~/bin/load-ssh-agent.sh
 
-# Set the display for the X-server
-export DISPLAY=:0.0
-
 # set the needed environment variables for qmake and Visual Studio et cetera.
 source ~/bin/set-env.sh
 
-# Start the X-server
-source ~/bin/xserver-start.sh
+# When logging in from windows sshd shell.
+if [[ "${SSH_TTY}" != "windows-pty" ]]; then
+
+	# Set the display for the X-server
+	export DISPLAY=:0.0
+
+	# Start the X-server
+	source ~/bin/xserver-start.sh
+
+fi
 
 export EDITOR='joe'
