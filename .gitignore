@@ -1,0 +1,4 @@
+# Configured mounts for 'mnt' script.
+mnt.mounts
+# Jetbrains IDE's project config.
+.idea
