@@ -24,6 +24,8 @@ else
 		# Also the socket which has a pid -1 name in the temp dir.
 		export SSH_AUTH_SOCK="$(ls "${TEMP}/ssh-"*"/agent.$((${CUR_PID}-1))")"
 		# echo "Found ssh-agent at pid '${CUR_PID}' and socket  '${SSH_AUTH_SOCK}'."
+		# Also set the Windows users environment.
+		setx SSH_AUTH_SOCK "${SSH_AUTH_SOCK}"
 	fi
         
 fi
