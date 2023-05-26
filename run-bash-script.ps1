@@ -1,6 +1,6 @@
 param (
-    [Parameter(Mandatory=$true, Position=0)]
-    [string] $shellScript
+    [Parameter(Mandatory=$true)][string] $shellScript,
+    [Parameter(Mandatory=$false)][string] $argument1
 )
 # Make the script stop on the first error.
 $ErrorActionPreference = "Stop"
@@ -32,4 +32,4 @@ $consoleHandle = [Win32]::GetConsoleWindow()
 # Bash executable path.
 $executablePath = "C:\cygwin64\bin\bash.exe"
 # Run the shell script.
-& $executablePath --login -c "$\{HOME\}/bin/${shellScript}"
+& $executablePath --login -c "$`{HOME}/bin/${shellScript} ${argument1}"

@@ -43,6 +43,8 @@ function Create-Shortcut([string] $exePath, [string] $arguments, [string] $targe
     $ws = New-Object -ComObject WScript.Shell
     # Create the shortcut and fill in the properties.
     $sc = $ws.CreateShortcut($target)
+		# Start in minimized style.
+		$sc.WindowStyle = 7
     $sc.TargetPath = $exePath
     $sc.Arguments = $arguments
     $sc.IconLocation = $iconPath
@@ -125,18 +127,18 @@ $toolTip.SetToolTip($btn, 'Create a X-CLion application shortcut in the programs
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 5)
 $tabBashApps.Controls.Add($btn)
-$btn.Add_Click({ Create-Bash-Shortcut "X-CLion" "xclion" "clion.ico" "$destDir" })
+$btn.Add_Click({ Create-Bash-Shortcut "X-CLion" "x-application.sh clion" "clion.ico" "$destDir" })
 
 ##
 ## X-VSCode
 ##
 $btn = New-Object System.Windows.Forms.Button
-$btn.Text = "VSCode"
+$btn.Text = "X-VSCode"
 $toolTip.SetToolTip($btn, 'Create a VSCode application shortcut in the programs menu..')
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 45)
 $tabBashApps.Controls.Add($btn)
-$btn.Add_Click({ Create-Bash-Shortcut "X-VSCode" "xcode" "vscode.ico" "$destDir" })
+$btn.Add_Click({ Create-Bash-Shortcut "X-VSCode" "x-application.sh code" "vscode.ico" "$destDir" })
 
 ##
 ## X-Netbeans
@@ -147,7 +149,18 @@ $toolTip.SetToolTip($btn, 'Create a X-Netbeans application shortcut in the progr
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 85)
 $tabBashApps.Controls.Add($btn)
-$btn.Add_Click({ Create-Bash-Shortcut "X-Netbeans" "xnetbeans" "netbeans.ico" "$destDir" })
+$btn.Add_Click({ Create-Bash-Shortcut "X-Netbeans" "x-application.sh netbeans" "netbeans.ico" "$destDir" })
+
+##
+## X-Dolphin
+##
+$btn = New-Object System.Windows.Forms.Button
+$btn.Text = "X-Dolphin"
+$toolTip.SetToolTip($btn, 'Create a X-Dolphin application shortcut in the programs menu..')
+$btn.AutoSize = $true
+$btn.Location = New-Object System.Drawing.Point(5, 125)
+$tabBashApps.Controls.Add($btn)
+$btn.Add_Click({ Create-Bash-Shortcut "X-Dolphin" "x-application.sh dolphin" "dolphin.ico" "$destDir" })
 
 # Add the tab control to the form
 $Form.Controls.Add($TabControl)

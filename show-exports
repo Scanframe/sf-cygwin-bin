@@ -4,8 +4,8 @@ CMD="nm"
 
 # Check if the command is installed.
 if ! [[ -x "$(command -v ${CMD})" ]]; then
-  echo "Error: ${CMD} is not installed." >&2
-  exit 1
+	echo "Error: ${CMD} is not installed." >&2
+	exit 1
 fi
 
 if [[ -z "$1" ]]; then
@@ -13,12 +13,17 @@ if [[ -z "$1" ]]; then
 	exit 1
 fi
 
-FILE="$(cygpath -w ${1})"
 
-# Execute the command and remove duplicate lines and discard weak symbols.
-#nm --demangle --defined-only --extern-only "${FILE}" | sort -r | uniq | sed -e '/^[0-9a-f]* [ARIDB] .*$/d'
-# d000612.o:
-nm --demangle --defined-only --extern-only "${FILE}" | sort -r | uniq | sed -e '/^[0-9a-f]* [ARIDB] .*$/d' | sed -e '/^d.*$/d'
-#nm --demangle --defined-only --extern-only "${FILE}" | sort -r | uniq
-#nm --demangle --dynamic --defined-only --extern-only "${1}" | uniq
+ext="$(echo "$1" | pcregrep -o1 '^.*\.(.*)$')"
 
+case "${ext}" in
+	a)
+		nm -g "${1}" | c++filt  | sort -r | uniq | sed -e '/^[0-9a-f]* W .*$/d'
+		;;
+	so)
+		nm --demangle --dynamic --defined-only --extern-only "${1}" | sort -r | uniq | sed -e '/^[0-9a-f]* W .*$/d'
+		;;
+	*)
+		echo "Extension '.$ext' not implemented."
+		;;
+esac
