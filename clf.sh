@@ -7,16 +7,16 @@ source "${SCRIPT_DIR}/WriteLog.sh"
 # Prints the help.
 #
 function ShowHelp {
-	echo "Usage: ${0} [<options>] [<directory>]
+	echo "Usage: ${0} [<options>] <directory>
   Options:
   -h, --help      : Show this help.
   -r, --recursive : Recursively iterate through all sub directories.
   -s, --show      : Show the differences.
   -d, --depth     : Maximum directory depth.
   -f, --format    : Format found files.
-  directory       : Optional directory to start.
+  directory       : Directory to start in.
 
-  The is script formats the code using the file '.clang_format' found in one of the parent directories.
+  The script formats the code using the file '.clang_format' found in one of its parent directories.
 
   See for formatting options for configuration file:
      https://clang.llvm.org/docs/ClangFormatStyleOptions.html
