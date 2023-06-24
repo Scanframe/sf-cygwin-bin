@@ -87,7 +87,7 @@ $form.CancelButton = $cancelButton
 # Create the tab control
 $tabControl = New-Object System.Windows.Forms.TabControl
 $tabControl.Location = New-Object System.Drawing.Point(5, 5)
-$tabControl.Size = New-Object System.Drawing.Size(300, 200)
+$tabControl.Size = New-Object System.Drawing.Size(300, 300)
 # Create the web apps tab
 $tabBashApps = New-Object System.Windows.Forms.TabPage
 $tabBashApps.Text = "Bash Scripts"
@@ -152,13 +152,24 @@ $tabBashApps.Controls.Add($btn)
 $btn.Add_Click({ Create-Bash-Shortcut "X-Netbeans" "x-application.sh netbeans" "netbeans.ico" "$destDir" })
 
 ##
+## X-PyCharm
+##
+$btn = New-Object System.Windows.Forms.Button
+$btn.Text = "X-PyCharm"
+$toolTip.SetToolTip($btn, 'Create a X-PyCharm application shortcut in the programs menu..')
+$btn.AutoSize = $true
+$btn.Location = New-Object System.Drawing.Point(5, 125)
+$tabBashApps.Controls.Add($btn)
+$btn.Add_Click({ Create-Bash-Shortcut "X-PyCharm" "x-application.sh pycharm" "pycharm.ico" "$destDir" })
+
+##
 ## X-Dolphin
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "X-Dolphin"
 $toolTip.SetToolTip($btn, 'Create a X-Dolphin application shortcut in the programs menu..')
 $btn.AutoSize = $true
-$btn.Location = New-Object System.Drawing.Point(5, 125)
+$btn.Location = New-Object System.Drawing.Point(5, 165)
 $tabBashApps.Controls.Add($btn)
 $btn.Add_Click({ Create-Bash-Shortcut "X-Dolphin" "x-application.sh dolphin" "dolphin.ico" "$destDir" })
 

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Windows location of pandoc.
+PANDOC_BIN="$(cygpath -u "${USERPROFILE}\AppData\Local\Pandoc\pandoc.exe")"
+
+# Check if pandoc is installed.
+if [[ ! -f "${PANDOC_BIN}" ]]; then
+	# Install pandoc using winget locally.
+	echo "Installing PanDoc locally using WinGet."
+	winget install --source winget --exact --id JohnMacFarlane.Pandoc
+	# Double Check.
+	if [[ ! -f "${PANDOC_BIN}" ]]; then
+		echo "Installation of pandoc still not found after install!"
+		exit 1
+	fi 
+fi
+
+# Run pandoc with all this script's arguments.
+"${PANDOC_BIN}" "$@"

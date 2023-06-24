@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Check if CLion is installed in the users 'lib' directory.
 CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
 # Check if CLion is installed in users 'lib' directory.
@@ -10,8 +11,12 @@ fi
 # Check if the CLion directory exists.
 if [[ -d "${CLION_BIN_DIR}" ]] ; then
 	export PATH="${PATH}:${CLION_BIN_DIR}/mingw/bin"
-	cygstart --directory="${CLION_BIN_DIR}" clion64.exe
+	cygstart --directory="${CLION_BIN_DIR}" clion64.exe "$@"
 else
-	echo "Could not find a CLion directory!"
+	echo "Could not find a CLion installation!"
+	read -r -p "Install CLion using WinGet? [y/N] " response
+	if [[ "$response" =~ ^[yY]$ ]]; then
+		winget install -e --id JetBrains.CLion
+	fi
 	exit 1
 fi

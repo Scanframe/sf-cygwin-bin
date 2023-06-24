@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Check if PyCharm is installed in the users 'lib' directory.
+PYCHARM_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/PyCharm"*/bin 2> /dev/null)"
+# Check if PyCharm is installed in users 'lib' directory.
+if [[ -z "${PYCHARM_BIN_DIR}" ]]; then
+	# shellcheck disable=SC2154
+	PYCHARM_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/JetBrains/PyCharm"*/bin 2> /dev/null)"
+fi
+# Check if the PyCharm directory exists.
+if [[ -d "${PYCHARM_BIN_DIR}" ]] ; then
+	export PATH="${PATH}:${PYCHARM_BIN_DIR}/mingw/bin"
+	cygstart --directory="${PYCHARM_BIN_DIR}" pycharm64.exe "$@"
+else
+	echo "Could not find a PyCharm directory!"
+	exit 1
+fi

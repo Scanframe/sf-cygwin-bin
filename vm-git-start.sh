@@ -39,6 +39,17 @@ case "$1" in
 		VBoxManage modifyvm "${VM_ID}" --nested-hw-virt on
 		;;
 
+	ln)
+		if [[ -z "$2" ]]; then
+			echo "Missing shared folder argument."
+			VBoxManage showvminfo "${VM_ID}" | grep "Shared folders" -A 10 | grep "Name:"
+		fi
+		# Set setting.
+		VBoxManage setextradata "${VM_ID}" "VBoxInternal2/SharedFoldersEnableSymlinksCreate/$2" 1
+		# Report setting back.
+		VBoxManage getextradata "${VM_ID}" "VBoxInternal2/SharedFoldersEnableSymlinksCreate/$2"
+		;;
+
 	*)
 		ShowHelp
     exit 1
