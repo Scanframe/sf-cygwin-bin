@@ -70,7 +70,7 @@ function GetMountPath()
 # Options to use.
 OPTS="allow_root,reconnect,follow_symlinks,transform_symlinks,compression=no" 
 OPTS_IPV4="ssh_command=ssh -4"
-OPTS_IDS="idmap=user,uid=$(id -u),gid=$(id -g)"
+OPTS_IDS="idmap=user,uid=$(id -u),gid=$(id -g),create_umask=027"
 #ServerAliveInterval=15,ServerAliveCountMax=3,ciphers=aes128-ctr,"
 
 # Include file containing mount functions.
