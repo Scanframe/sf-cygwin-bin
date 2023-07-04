@@ -1,27 +1,43 @@
 #!/bin/bash
 
-CMD="nm"
+# Check if the needed commands are installed.
+COMMANDS=(
+	"nm"
+	"pcregrep"
+	"file"
+	"sed"
+)
+for COMMAND in "${COMMANDS[@]}"; do
+	if ! command -v "${COMMAND}" >/dev/null; then
+		echo "Missing command '${COMMAND}' for this script"
+		exit 1
+	fi
+done
 
-# Check if the command is installed.
-if ! [[ -x "$(command -v ${CMD})" ]]; then
-	echo "Error: ${CMD} is not installed." >&2
-	exit 1
-fi
-
+# Show usage help when no argument is passed on the command line.
 if [[ -z "$1" ]]; then
 	echo "Usage: $0 <lib-file>"
 	exit 1
 fi
 
-
 ext="$(echo "$1" | pcregrep -o1 '^.*\.(.*)$')"
+echo "Exports of file (${ext}): $1"
 
+# Detect executable.
+if [[ -z "${ext}" && "$(file -bi "$1")" =~ ^application/x-pie-executable\; ]]; then
+	ext="bin"
+fi
+
+# Depending on the extension use the correct options for 'nm' command.
 case "${ext}" in
 	a)
-		nm -g "${1}" | c++filt  | sort -r | uniq | sed -e '/^[0-9a-f]* W .*$/d'
+		nm -g "${1}" | c++filt  | sort -ru | sed -e '/^[0-9a-f]* W .*$/d'
 		;;
 	so)
-		nm --demangle --dynamic --defined-only --extern-only "${1}" | sort -r | uniq | sed -e '/^[0-9a-f]* W .*$/d'
+		nm --demangle --dynamic --defined-only --extern-only "${1}" | sort -ru | sed -e '/^[0-9a-f]* W .*$/d'
+		;;
+	bin)
+		nm --demangle --dynamic --defined-only --extern-only "${1}" | sort -ru | sed -e '/^[0-9a-f]* W .*$/d'
 		;;
 	*)
 		echo "Extension '.$ext' not implemented."
