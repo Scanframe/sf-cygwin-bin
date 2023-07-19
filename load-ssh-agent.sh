@@ -14,7 +14,7 @@ if [[ "${TERM_PROGRAM}" == "mintty" && -z "${SSH_AGENT_PID}" ]] ; then
 	
 	echo 'Hint use from CLI: set CHERE_INVOKING=1 & C:\cygwin64\bin\bash.exe --login'
 
-# Othewise try to get the enviroment vars from the running agent.
+# Otherwise try to get the enviroment vars from the running agent.
 else
 	
 	# Get the running ssh-agent pid.
@@ -23,9 +23,9 @@ else
 		export SSH_AGENT_PID="${CUR_PID}"
 		# Also the socket which has a pid -1 name in the temp dir.
 		export SSH_AUTH_SOCK="$(ls "${TEMP}/ssh-"*"/agent.$((${CUR_PID}-1))")"
-		# echo "Found ssh-agent at pid '${CUR_PID}' and socket  '${SSH_AUTH_SOCK}'."
+		#echo "Found ssh-agent at pid '${CUR_PID}' and socket  '${SSH_AUTH_SOCK}'."
 		# Also set the Windows users environment.
-		setx SSH_AUTH_SOCK "${SSH_AUTH_SOCK}"
+		setx SSH_AUTH_SOCK "${SSH_AUTH_SOCK}" > /dev/null
 	fi
         
 fi
