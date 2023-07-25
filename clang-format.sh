@@ -3,7 +3,7 @@
 # Get the script directory.
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 # Include WriteLog function.
-source "${SCRIPT_DIR}/WriteLog.sh"
+source "${SCRIPT_DIR}/inc/WriteLog.sh"
 # Prints the help.
 #
 function ShowHelp {

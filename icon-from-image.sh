@@ -11,7 +11,7 @@ fi
 
 # Check if the amount of arguments are passed
 if [[ -z "$1" || -z "$2" ]] ; then
-	echo  "Usage: $(basename $0) <imput-image> <output-ico-file>"
+	echo  "Usage: $(basename "$0") <imput-image> <output-ico-file>"
 	exit 1
 fi
 
