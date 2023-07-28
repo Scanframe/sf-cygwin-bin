@@ -23,6 +23,14 @@ as well as to use Cygwin tools and applications within the Windows operating con
 
 ## Installing
 
+### WinGet
+
+Simple from the command-line.
+
+```shell
+winget install --exact --id Cygwin.Cygwin
+```
+
 ### Downloading
 
 Goto the Cygwin [website](https://www.cygwin.com/ "Link to cygwin website.") and download 64 bit version of Cygwin.
