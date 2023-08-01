@@ -198,10 +198,12 @@ source ~/bin/set-env.sh
 # When logging in from windows sshd shell.
 if [[ "${SSH_TTY}" != "windows-pty" ]]; then
 
-	# Set the display for the X-server
-	export DISPLAY=:0.0
+	# Set the display for the X-server to default :0 (port=6000) when not exported.
+	if [[ "${DISPLAY}" =="" ]]; then
+		export DISPLAY=:0
+	fi 
 
-	# Start the X-server
+	# Start the X-server.
 	source ~/bin/xserver-start.sh
 
 fi

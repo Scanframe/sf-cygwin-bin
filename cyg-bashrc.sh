@@ -126,10 +126,12 @@ fi
 source load-ssh-agent.sh
 
 # Only when started from mintty console application.
-if [[ "${TERM_PROGRAM}" == "mintty" ]] ; then
+if [[ "${SSH_TTY}" != "windows-pty" ]]; then
 
-	# Set the display for the X-server
-	export DISPLAY=:0.0
+        # Set the display for the X-server to default :0.0 (port=6000) when not exported.
+        if [[ -z "${DISPLAY}" ]]; then
+                export DISPLAY=:0
+        fi
 
 	# set the needed environment variables for qmake and Visual Studio et cetera.
 	#source ~/bin/set-env.sh
