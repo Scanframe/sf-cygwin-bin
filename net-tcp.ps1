@@ -61,4 +61,4 @@ if ($ShowHelp)
     exit
 }
 
-Get-NetTCPConnection | Get-NetTCPConnectionWithProcess | Format-Table -AutoSize -Property LocalAddress, LocalPort, RemoteAddress, RemotePort, State, PID, ProcessName, CommandLine
+Get-NetTCPConnection | Get-NetTCPConnectionWithProcess | Format-Table -AutoSize -Wrap -Property LocalAddress, LocalPort, RemoteAddress, RemotePort, State, PID, ProcessName, CommandLine
