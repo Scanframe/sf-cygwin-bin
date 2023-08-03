@@ -1,5 +1,5 @@
 #!/bin/env bash
-# Assemble the command path for Notepad++
+# Assemble the command path for Sublime text
 
 CMD_PATH="$(cygpath -u "${PROGRAMFILES}\\Sublime Text\\sublime_text.exe")"
 
