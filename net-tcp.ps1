@@ -22,7 +22,7 @@ function Get-NetTCPConnectionWithProcess
 
     process 
     {
-        if ($PortNumber -and $connection.LocalPort -eq $PortNumber) 
+				if ($PortNumber -and ($connection.LocalPort -eq $PortNumber -or $connection.RemotePort -eq $PortNumber)) 
         {
             $filteredConnections += $connection
         } 
@@ -54,9 +54,9 @@ function Get-NetTCPConnectionWithProcess
 
 if ($ShowHelp) 
 {
-    Write-Host "Usage: net-tcp.ps1 [-p <port>] [-n <process name pattern>] [-h]"
+    Write-Host "Usage: net-tcp.ps1 [-p <port>] [-h]"
     Write-Host "Options:"
-    Write-Host "  -p <port>                 Filter connections by the specified port number."
+    Write-Host "  -p <port>                 Filter connections by the specified port number local or remote."
     Write-Host "  -h                        Show this help message."
     exit
 }
