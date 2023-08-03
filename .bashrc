@@ -199,7 +199,7 @@ source ~/bin/set-env.sh
 if [[ "${SSH_TTY}" != "windows-pty" ]]; then
 
 	# Set the display for the X-server to default :0 (port=6000) when not exported.
-	if [[ "${DISPLAY}" =="" ]]; then
+	if [[ "${DISPLAY}" == "" ]]; then
 		export DISPLAY=:0
 	fi 
 
