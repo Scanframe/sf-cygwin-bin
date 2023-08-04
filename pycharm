@@ -12,6 +12,10 @@ if [[ -d "${PYCHARM_BIN_DIR}" ]] ; then
 	export PATH="${PATH}:${PYCHARM_BIN_DIR}/mingw/bin"
 	cygstart --directory="${PYCHARM_BIN_DIR}" pycharm64.exe "$@"
 else
-	echo "Could not find a PyCharm directory!"
+	echo "Could not find a PyCharm installation!"
+	# read -r -p "Install PyCharm using WinGet? [y/N] " response
+	if [[ "$response" =~ ^[yY]$ ]]; then
+		winget install -e --id JetBrains.PyCharm.Communit
+	fi
 	exit 1
 fi
