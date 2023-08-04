@@ -6,10 +6,15 @@ PYCHARM_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/PyC
 if [[ -z "${PYCHARM_BIN_DIR}" ]]; then
 	# shellcheck disable=SC2154
 	PYCHARM_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/JetBrains/PyCharm"*/bin 2> /dev/null)"
+	# Check other possible install path.
+	if [[ -z "${PYCHARM_BIN_DIR}" ]]; then
+		ENV_TMP="$(env | grep "^ProgramFiles(x86)=")"
+		ENV_TMP="${ENV_TMP:18}"
+		PYCHARM_BIN_DIR="$(ls -d "$(cygpath -u "${ENV_TMP}")/JetBrains/PyCharm"*/bin 2> /dev/null)"
+	fi
 fi
 # Check if the PyCharm directory exists.
 if [[ -d "${PYCHARM_BIN_DIR}" ]] ; then
-	export PATH="${PATH}:${PYCHARM_BIN_DIR}/mingw/bin"
 	cygstart --directory="${PYCHARM_BIN_DIR}" pycharm64.exe "$@"
 else
 	echo "Could not find a PyCharm installation!"
