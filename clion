@@ -16,7 +16,7 @@ else
 	echo "Could not find a CLion installation!"
 	read -r -p "Install CLion using WinGet? [y/N] " response
 	if [[ "$response" =~ ^[yY]$ ]]; then
-		winget install -e --id JetBrains.CLion
+		winget install --exact --id JetBrains.CLion
 	fi
 	exit 1
 fi
