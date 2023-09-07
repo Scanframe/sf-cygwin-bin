@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Check if CLion is installed in the users 'lib' directory.
 CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
 # Check if CLion is installed in users 'lib' directory.
