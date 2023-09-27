@@ -62,7 +62,7 @@ function GetMountDrive()
 # Returns the full mount directory 
 # $2 = Mount name.
 #
-function GetMountPath()
+function GetMountPath
 {
 	echo "/cygdrive/$(GetMountDrive "$1")"
 }
@@ -84,7 +84,7 @@ else
 	cat << 'EOF' > "${mounts_file}"
 
 # Named mounting function example
-function Mount_example() 
+function Mount_example
 {
 	sshfs super@kubuntu: "$1:" -o "${OPTS},${OPTS_IDS},${OPTS_IPV4}" ;
 }
@@ -140,7 +140,7 @@ function DirectoryFuseMount()
 # Unmounts the passed directory.
 # $1 = Mount name.
 #
-function DirectoryFuseUnmount()
+function DirectoryFuseUnmount
 {
 	local dir drive
 	drive="$(GetMountDrive "$1")"

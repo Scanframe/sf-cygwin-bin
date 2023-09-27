@@ -102,7 +102,7 @@ $tabControl.Controls.Add($tabWebApps)
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "Google Drive"
-$toolTip.SetToolTip($btn, 'Create a Google Drive web application shortcut in the programs menu..')
+$toolTip.SetToolTip($btn, 'Create a Google Drive web application shortcut in the programs menu.')
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 5)
 $tabWebApps.Controls.Add($btn)
@@ -112,7 +112,7 @@ $btn.Add_Click({ Create-WebApp-Shortcut "Google-Drive" "https://drive.google.com
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "WhatsAppWeb"
-$toolTip.SetToolTip($btn, 'Create a WhatsApp-web application shortcut in the programs menu..')
+$toolTip.SetToolTip($btn, 'Create a WhatsApp-web application shortcut in the programs menu.')
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 45)
 $tabWebApps.Controls.Add($btn)
@@ -123,7 +123,7 @@ $btn.Add_Click({ Create-WebApp-Shortcut "WhatsApp" "https://web.whatsapp.com/" "
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "X-CLion"
-$toolTip.SetToolTip($btn, 'Create a X-CLion application shortcut in the programs menu..')
+$toolTip.SetToolTip($btn, 'Create a X-CLion application shortcut in the programs menu.')
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 5)
 $tabBashApps.Controls.Add($btn)
@@ -145,20 +145,31 @@ $btn.Add_Click({ Create-Bash-Shortcut "X-VSCode" "x-application.sh code" "vscode
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "X-Netbeans"
-$toolTip.SetToolTip($btn, 'Create a X-Netbeans application shortcut in the programs menu..')
+$toolTip.SetToolTip($btn, 'Create a X-Netbeans application shortcut in the programs menu.')
 $btn.AutoSize = $true
 $btn.Location = New-Object System.Drawing.Point(5, 85)
 $tabBashApps.Controls.Add($btn)
 $btn.Add_Click({ Create-Bash-Shortcut "X-Netbeans" "x-application.sh netbeans" "netbeans.ico" "$destDir" })
 
 ##
+## X-InteliJ
+##
+$btn = New-Object System.Windows.Forms.Button
+$btn.Text = "X-InteliJ"
+$toolTip.SetToolTip($btn, 'Create a InteliJ application shortcut in the programs menu.')
+$btn.AutoSize = $true
+$btn.Location = New-Object System.Drawing.Point(5, 125)
+$tabBashApps.Controls.Add($btn)
+$btn.Add_Click({ Create-Bash-Shortcut "X-InteliJ" "x-application.sh intelij" "intelij.ico" "$destDir" })
+
+##
 ## X-PyCharm
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "X-PyCharm"
-$toolTip.SetToolTip($btn, 'Create a X-PyCharm application shortcut in the programs menu..')
+$toolTip.SetToolTip($btn, 'Create a X-PyCharm application shortcut in the programs menu.')
 $btn.AutoSize = $true
-$btn.Location = New-Object System.Drawing.Point(5, 125)
+$btn.Location = New-Object System.Drawing.Point(5, 165)
 $tabBashApps.Controls.Add($btn)
 $btn.Add_Click({ Create-Bash-Shortcut "X-PyCharm" "x-application.sh pycharm" "pycharm.ico" "$destDir" })
 
@@ -167,9 +178,9 @@ $btn.Add_Click({ Create-Bash-Shortcut "X-PyCharm" "x-application.sh pycharm" "py
 ##
 $btn = New-Object System.Windows.Forms.Button
 $btn.Text = "X-Dolphin"
-$toolTip.SetToolTip($btn, 'Create a X-Dolphin application shortcut in the programs menu..')
+$toolTip.SetToolTip($btn, 'Create a X-Dolphin application shortcut in the programs menu.')
 $btn.AutoSize = $true
-$btn.Location = New-Object System.Drawing.Point(5, 165)
+$btn.Location = New-Object System.Drawing.Point(5, 205)
 $tabBashApps.Controls.Add($btn)
 $btn.Add_Click({ Create-Bash-Shortcut "X-Dolphin" "x-application.sh dolphin" "dolphin.ico" "$destDir" })
 
