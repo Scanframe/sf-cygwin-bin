@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -z "${DISPLAY}" ]]; then 
-	echo "Needed 'DISPLAY' enviroment variable not present@"
+	echo "Needed 'DISPLAY' environment variable not present!"
 	exit 1
 fi
 
