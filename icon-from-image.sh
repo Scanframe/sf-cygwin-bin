@@ -4,7 +4,7 @@
 CMD_BIN="/usr/bin/convert"
 
 # Check if the command exists.
-if ! command -v "${CMD_BIN}" > /dev.null ; then
+if ! command -v "${CMD_BIN}" > /dev/null ; then
 	echo "Command '${CMD_BIN}' is not installed!"
 	exit 1
 fi

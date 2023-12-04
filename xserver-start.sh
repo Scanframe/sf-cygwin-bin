@@ -4,7 +4,7 @@
 SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 # Check if 'X' command is not installed use external X-server.
-if ! command -v "XWin" > /dev.null ; then
+if ! command -v "XWin" > /dev/null ; then
 
 	# If the batch file is running do not start the X-server.
 	if [[ $(pgrep vcxsrv.bat | wc -l) -eq 0 ]]; then
