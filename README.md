@@ -21,7 +21,12 @@ Cygwin provides native integration of Windows-based applications, data, and othe
 software tools, and data of the Unix-like environment. Thus, it is possible to launch Windows applications from the Cygwin environment,
 as well as to use Cygwin tools and applications within the Windows operating context.
 
-## Installing
+## Installing Powershell Script
+
+Download the PowerShell script **[install-cygwin.ps1](/Scanframe/sf-cygwin-bin/blob/master/install-cygwin.ps1 "Link to script repository location.")**
+from this repository to install Cygwin and configure pseudo automatically.
+
+## Installing Manually
 
 ### WinGet
 
@@ -30,6 +35,8 @@ Simple from the command-line.
 ```shell
 winget install --exact --id Cygwin.Cygwin
 ```
+
+> Seems to be broken
 
 ### Downloading
 
@@ -40,9 +47,17 @@ Run the Installer and install it in the default location (`C:\cygwin64`) for all
 Use a nearby proxy for fast downloading the packages.
  
 Select the following initial needed packages using the Setup application:
+* git
 * wget
 * openssh
-* git
+* bash-completion
+* psmisc
+* procps
+* libproc2-0
+* joe
+* mc
+* xorg-server
+* xterm
 
 Missing a package for a command look it up [here](https://cygwin.com/cgi-bin2/package-grep.cgi "Cygwin Package Search").
 
@@ -69,50 +84,20 @@ Clone the bin directory using this on the cygwin command-line.
 git clone https://github.com/Scanframe/sf-cygwin-bin ~/bin
 ```
 
-**Uncomment section in start script**
+**Copy Files**
 
-This next section is commented out in `.bash_profile` which need uncommenting.
+Copy the next 2 files to the home directory.
 
-```bash
-# source the users bashrc if it exists
-if [ -f "${HOME}/.bashrc" ] ; then
-  source "${HOME}/.bashrc"
-fi
-```
-
-Add this to the end of the file to enable `bash-completion` when it is installed.
+* `~/bin/.bash_profile` 
+* `~/bin/.bashrc` 
 
 ```bash
-# Use bash completion when installed.
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
-```
-
-**Include scripts into `.bashrc` from the `bin` repo"
-
-This addition is needed to have your `ssh-agent` and ssh-key loaded from your `.ssh` directory.
-
-```bash
-# Include bash from Ubuntu distro.
-source ~/bin/cyg-bashrc.sh
-
-# Load the ssh-agent and default key.
-source ~/bin/load-ssh-agent.sh
-
-# Set the display for the X-server
-export DISPLAY=:0.0
-
-# set the needed environment variables for qmake and Visual Studio et cetera.
-source ~/bin/set-env.sh
-
-# Start the X-server
-source ~/bin/xserver-start.sh
+cp "${HOME}/bin/"{.bash_profile,.bashrc} "${HOME}/"
 ```
 
 **Install additional packages from the command-line**
 
-After a cygwin restart all script from the script repository are ineffect and packages are now easily install using the `apt-cyg` script.
+After a Cygwin restart all script from the script repository are ineffect and packages are now easily install using the `apt-cyg` script.
 To find a certain command/application for cygwin use the package finder [here](https://cygwin.com/cgi-bin2/package-grep.cgi "Pacakge search")
 So installing the `killall` command you need to install the `psmisc` package like this:
 
@@ -133,7 +118,9 @@ Type `apt-cyg` for additional options when needed.
 > So run the Cygwin Setup again.
 
 
-# VcXsrv (X-server for Windows)
+# VcXsrv (Optional X-server for Windows)
+
+> This is an alternative to the Cygwin package `xorg-server`.
 
 ## Installing
 
