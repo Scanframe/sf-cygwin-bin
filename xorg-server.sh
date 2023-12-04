@@ -4,7 +4,7 @@
 CMD_BIN="XWin"
 
 # Check if the command exists.
-if ! command -v "${CMD_BIN}" > /dev.null ; then
+if ! command -v "${CMD_BIN}" >/dev/null ; then
 	echo "Command '${CMD_BIN}' is not installed!"
 	exit 1
 fi
@@ -16,7 +16,7 @@ if pgrep "${CMD_BIN}" >/dev/null ; then
 fi
 
 # Set the Display (port) to default ':0' tcp port 6000.
-if [[ "%DISPLAY%"=="" ]]; then
+if [[ -z "${DISPLAY}" ]]; then
 	DISPLAY=:0
 fi	
 

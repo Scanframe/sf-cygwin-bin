@@ -21,14 +21,26 @@ Cygwin provides native integration of Windows-based applications, data, and othe
 software tools, and data of the Unix-like environment. Thus, it is possible to launch Windows applications from the Cygwin environment,
 as well as to use Cygwin tools and applications within the Windows operating context.
 
-## Installing Powershell Script
+## Install using Powershell Script
 
 Download the PowerShell script **[install-cygwin.ps1](/Scanframe/sf-cygwin-bin/blob/master/install-cygwin.ps1 "Link to script repository location.")**
-from this repository to install Cygwin and configure pseudo automatically.
+from this repository to install Cygwin and configure it automatically.
 
-## Installing Manually
+What it does do:
+* Installs Windows multi-tab terminal. 
+* Download the Cygwin installer.
+* Install Cygwin and additional packages.
+* Configure the `%USERPROFILE%\cygwin` directory as the home directory for Cygwin Bash.
+* Clone this repository as the `~/bin` directory.
+* Copying `.bash_profile` and `.bashrc` from this repo into the home directory.
 
-### WinGet
+What it does NOT do:
+* Configure the multi-tab terminal for Windows using Cygwin.
+* Generate an SSH key.
+
+## Install Manually
+
+### Using WinGet Package Manager
 
 Simple from the command-line.
 
@@ -36,9 +48,10 @@ Simple from the command-line.
 winget install --exact --id Cygwin.Cygwin
 ```
 
-> Seems to be broken
+> Seems to be broken on a faulty hash (2023-12-01).  
+> In the mean-time download it manually.
 
-### Downloading
+### By Downloading
 
 Goto the Cygwin [website](https://www.cygwin.com/ "Link to cygwin website.") and download 64 bit version of Cygwin.
 Run the Cygwin **Setup** executable from a dedicated directory like `C:\Users\<home-dir>\lib\Cygwin-Setup` since it stores cached files 
@@ -53,6 +66,7 @@ Select the following initial needed packages using the Setup application:
 * bash-completion
 * psmisc
 * procps
+* jq
 * libproc2-0
 * joe
 * mc
@@ -118,7 +132,18 @@ Type `apt-cyg` for additional options when needed.
 > So run the Cygwin Setup again.
 
 
-# VcXsrv (Optional X-server for Windows)
+## Multi-Tab Terminal Application
+
+Install the multi-tab terminal which is a convenient way to have multiple terminals in a single window/application.  
+
+```shell
+winget install --exact --id Microsoft.WindowsTerminal
+```
+
+Configure the tab by opening the bat-file `C:\cygwin64\Cygwin.bat` and use icon file `C:\cygwin64\Cygwin-Terminal.ico`.
+
+
+## VcXsrv (Optional X-server for Windows)
 
 > This is an alternative to the Cygwin package `xorg-server`.
 
