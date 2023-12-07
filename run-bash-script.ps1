@@ -32,4 +32,4 @@ $consoleHandle = [Win32]::GetConsoleWindow()
 # Bash executable path.
 $executablePath = "C:\cygwin64\bin\bash.exe"
 # Run the shell script.
-& $executablePath --login -c "$`{HOME}/bin/${shellScript} ${argument1}"
+& $executablePath --login -i -c "$`{HOME}/bin/${shellScript} ${argument1}"
