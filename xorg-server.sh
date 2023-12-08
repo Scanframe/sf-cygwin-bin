@@ -20,8 +20,11 @@ if [[ -z "${DISPLAY}" ]]; then
 	DISPLAY=:0
 fi	
 
-# Execute the X-server using the correct options.
+# Execute the X-server using the correct options not opening a TCP port.
 "${CMD_BIN}" "${DISPLAY}" -dpi 96 -ac -lesspointer -multiwindow -multimonitors -hostintitle -clipboard -noprimary -fp built-ins +bs -nounixkill -nowinkill -silent-dup-error -wgl
+
+# This option is set to make the Z-server open an TCP-port.
+# -listen tcp
 
 # This options creates clipboard problems when selecting in Windows.
 # -noclipboardprimary
