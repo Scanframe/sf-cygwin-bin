@@ -1,5 +1,5 @@
 param (
-	[switch]$debug = $True
+	[switch]$debug
 )
 
 # Clear the console.
@@ -8,8 +8,8 @@ Clear
 # Local copy the current script.
 $ThisScript = $MyInvocation.MyCommand.Path
 
-# Switch on debug printing.
-if ($debug)
+# Switch on debug printing when env var 'DBG_PRINT' equals '1'.
+if ($debug -or ("${env:DBG_PRINT}" -eq "1"))
 {
 	$DebugPreference = 'Continue'
 }
@@ -25,9 +25,9 @@ if ($MyInvocation.UnboundArguments.Count)
 }
 
 # Returns the name of the calling function.
-function Get-FunctionName ([int]$StackNumber = 1)
+function Get-FunctionName([int]$StackNumber = 1)
 {
-	return [string]$(Get-PSCallStack)[$StackNumber].FunctionName
+	return [string]$( Get-PSCallStack )[$StackNumber].FunctionName
 }
 
 function PressAnyKey
@@ -71,7 +71,7 @@ function Cygwin-WebInstall
 		# When updating remove the current setup executable.
 		if ($update -and (Test-Path -Path $setupExe))
 		{
-			Write-Debug "$(Get-FunctionName): Removing old file: ${setupExe}"
+			Write-Debug "$( Get-FunctionName ): Removing old file: ${setupExe}"
 			Remove-Item $setupExe
 		}
 		Write-Host "Downloading ($setupExe): $url"
@@ -80,7 +80,7 @@ function Cygwin-WebInstall
 	}
 	else
 	{
-		Write-Debug "$(Get-FunctionName): Cygwin setup exists in: $installDir"
+		Write-Debug "$( Get-FunctionName ): Cygwin setup exists in: $installDir"
 	}
 	# When update is required do this step anyway.
 	if ($update -or -not(Test-Path -Path "${rootDir}/Cygwin.bat"))
@@ -110,7 +110,7 @@ function Cygwin-WebInstall
 		)
 		# The '-PassThru' options is needed to make it return the 'System.Diagnostics.Process' object.
 		$process = Start-Process -Wait -PassThru -FilePath $setupExe -ArgumentList "$( $arguments -join " " )"
-		Write-Debug "$(Get-FunctionName): Exit-code: 0x$($process.ExitCode.ToString("X") )"
+		Write-Debug "$( Get-FunctionName ): Exit-code: 0x$($process.ExitCode.ToString("X") )"
 		# Get the exit code and return true when zero.
 		return ($process.ExitCode -eq 0)
 	}
@@ -125,11 +125,17 @@ function Cygwin-WebInstall
 function WinGet-IsPackageInstalled
 {
 	param ([string]$appId)
+<#
 	# Get the list the installed app from the list.
 	$process = Start-Process -Wait -PassThru -Verb RunAs -FilePath $wingetexe -ArgumentList "list --accept-source-agreements --exact --id `"$appId`""
+	$exitcode = $process.ExitCode
+#>
+	# Get the list the installed app from the list.
+	(&"$wingetexe" list --exact --id "$appId") | Out-Null
+	$exitcode = $LASTEXITCODE
 	# Get the exit code and return true when zero.
-	Write-Debug "$(Get-FunctionName): Exitcode 0x$($process.ExitCode.ToString("X") )"
-	if ($process.ExitCode -eq 0)
+	Write-Debug "$( Get-FunctionName ): Exitcode 0x$($exitcode.ToString("X") )"
+	if ($exitcode -eq 0)
 	{
 		# The app was installed using the exact app id
 		Write-Host "The app with id '$appId' is installed."
@@ -143,18 +149,30 @@ function WinGet-IsPackageInstalled
 # Installs a WinGet package when not installed already.
 function WinGet-InstallPackage
 {
-	param ([string]$appId)
+	param (
+		[switch]$update,
+		[string]$appId
+	)
 	$result = (WinGet-IsPackageInstalled "$appId")
-	if (-not $result)
+	if (-not$result)
 	{
-		Write-Host "$appId Installing '${appId}' ..."
+		Write-Host "Installing '${appId}' ..."
 		&"$wingetexe" install --accept-source-agreements --accept-package-agreements --exact --id "$appId"
 		$result = $LASTEXITCODE -eq 0
-		Write-Debug "$(Get-FunctionName): Exitcode 0x$($LASTEXITCODE.ToString("X") )"
+		Write-Debug "$( Get-FunctionName ): Exitcode 0x$($LASTEXITCODE.ToString("X") )"
 		# Check for error 'APPINSTALLER_CLI_ERROR_SOURCE_AGREEMENTS_NOT_ACCEPTED'.
 		if ("0x$($LASTEXITCODE.ToString("X") )" -eq "0x8A150046")
 		{
-			Write-Host "$(Get-FunctionName): Failed, please Run 'winget' to accept the agreemment first for winget?"
+			Write-Host "$( Get-FunctionName ): Failed, please Run 'winget' to accept the agreemment first for winget?"
+		}
+	}
+	else
+	{
+		if ($update)
+		{
+			Write-Host "Upgrading '${appId}' ..."
+			&"$wingetexe" update --exact --id "$appId"
+			$result = $LASTEXITCODE -eq 0
 		}
 	}
 	Return $result
@@ -184,6 +202,7 @@ if (-not(WinGet-IsInstalled))
 # Installs Cygwin and configures it.
 function Cygwin-Configure
 {
+	param ([switch]$update)
 	$repoCygwinBin = "https://github.com/Scanframe/sf-cygwin-bin.git"
 	$rootDir = "${env:SystemDrive}\cygwin64"
 	$filePath = "$rootDir\etc\nsswitch.conf"
@@ -195,12 +214,17 @@ function Cygwin-Configure
 		Write-Host "File '$filePath' not found to append!"
 		Return $False
 	}
-	# REad the file in an array.
+	Write-Debug "$( Get-FunctionName ): Checking file '$filePath'."
+	# Read the file in an array.
 	$lines = Get-Content -Path $filePath
 	if (($lines | Where-Object { $_ -eq $line }).Count -eq 0)
 	{
 		Write-Host "Adding line for home directory to file '$filePath'."
 		Add-Content -Path "$filePath" -Value "$line"
+	}
+	else
+	{
+		Write-Host "Line for home directory already exists in file '$filePath'."
 	}
 	# Create cygwin home directory when it does not exist.
 	if (-not(Test-Path -Path $homeDir))
@@ -208,21 +232,45 @@ function Cygwin-Configure
 		Write-Host "Creating home directory '$homeDir'."
 		New-Item -ItemType Directory -Path $homeDir
 	}
+	else
+	{
+		Write-Host "Home directory '$homeDir' exists."
+	}
 	# Create cygwin home directory when it does not exist.
 	if (-not(Test-Path -Path $binDir))
 	{
-		Set-Location "${homeDir}"
-		& "${rootDir}\bin\bash" --login -c "/usr/bin/git clone ${repoCygwinBin} bin"
+		Write-Host "Cloning 'bin' repository to create '${homeDir}\bin' directory."
+		& "${rootDir}\bin\bash" --login -c "/usr/bin/git clone ${repoCygwinBin} ~/bin"
 		# Check if the command was executed without an error.
 		if ($LASTEXITCODE -ne 0)
 		{
 			Return $False
 		}
-		# Sanity check if the directory exists.
-		if (Test-Path -Path $binDir)
+	}
+	# When the directory exists and update is requested.
+	elseif ($update)
+	{
+		Write-Host "Pulling '${homeDir}\bin' repository to update."
+		& "${rootDir}\bin\bash" --login -c "/usr/bin/git -C ~/bin pull"
+		# Check if the command was executed without an error.
+		if ($LASTEXITCODE -ne 0)
 		{
-			Write-Host "Copying profile files to '$homeDir'."
-			Copy-Item -Path "$binDir\.bash_profile", "$binDir\.bashrc" -Destination $homeDir
+			Return $False
+		}
+	}
+	# Sanity check if the directory exists.
+	if (Test-Path -Path $binDir)
+	{
+		Write-Host "Checking profile files in '$homeDir'."
+		if (-not(Test-Path -Path "${homeDir}\.bash_profile"))
+		{
+			Write-Host "Copying '.bash_profile'."
+			Copy-Item -Path "$binDir\.bash_profile" -Destination $homeDir
+		}
+		if (-not(Test-Path -Path "${homeDir}\.bashrc"))
+		{
+			Write-Host "Copying '.bashrc'."
+			Copy-Item -Path "$binDir\.bashrc" -Destination $homeDir
 		}
 	}
 	Return $True
@@ -256,7 +304,7 @@ function WindowsTerminal-CygwinProfile
 	# Created a saved copy whenit does not exists yet.
 	if (-not(Test-Path -Path "${filepath}-saved"))
 	{
-		Write-Debug "$(Get-FunctionName): Creating saved copy of Terminal settings file."
+		Write-Debug "$( Get-FunctionName ): Creating saved copy of Terminal settings file."
 		Copy-Item -Path $filepath -Destination "${filepath}-saved"
 	}
 	$json = ConvertFrom-Json -InputObject (Get-Content -Raw "${filepath}")
@@ -265,7 +313,7 @@ function WindowsTerminal-CygwinProfile
 	# Check if the GUID Cygwin entry exists.
 	if (($json.profiles.list | where { $_.guid -eq "$guid" }) -eq $null)
 	{
-		Write-Debug "$(Get-FunctionName): Terminal Cywin entry not found, adding it..."
+		Write-Debug "$( Get-FunctionName ): Terminal Cywin entry not found, adding it..."
 		# Add entry to the list.
 		$obj = @'
 {
@@ -290,7 +338,7 @@ function WindowsTerminal-CygwinProfile
 		$json.defaultProfile = $guid
 		# Convert to json adding depth because without it the objects are not converted corerctly.
 		(ConvertTo-Json -Depth 32 -InputObject $json).Replace("`r`n", "`n")  | Out-File -Encoding UTF8 -Filepath $filepath -NoNewline
-		Write-Debug "$(Get-FunctionName): Making new Cygwin entry the default."
+		Write-Debug "$( Get-FunctionName ): Making new Cygwin entry the default."
 	}
 	Return $True
 }
@@ -303,30 +351,48 @@ if ($choice -ne 0)
 	# Initialize the return value.
 	$retval = $True
 	# Install Cygwin using the web download.
-	if ($choice -eq 2)
+	if ($retval -and $choice -eq 2)
 	{
 		# Install Cygwin using the web download doing an update.
-		$retval = $retval -and (Cygwin-WebInstall -update)
+		$retval = Cygwin-WebInstall -update
 	}
 	else
 	{
 		# Install Cygwin using the web download.
-		$retval = $retval -and (Cygwin-WebInstall)
+		$retval = Cygwin-WebInstall
 	}
 	# Configure Cygwin for this user.
-	$retval = $retval -and (Cygwin-Configure)
-	# Install the multi tab Windows terminal.
-	if ($retval -and (WinGet-InstallPackage "9N0DX20HK701"))
+	if ($retval -and $choice -eq 2)
 	{
-		# Add the Cygwin profile and make it the default.
-		$retval = WindowsTerminal-CygwinProfile
+		$retval = Cygwin-Configure -update
 	}
 	else
 	{
-		$retval = $False
+		$retval = Cygwin-Configure
+	}
+	# Install the multi tab Windows terminal.
+	if ($retval -and $choice -eq 2)
+	{
+		$retval = WinGet-InstallPackage -update "9N0DX20HK701"
+	}
+	else
+	{
+		$retval = WinGet-InstallPackage "9N0DX20HK701"
+	}
+	# Add the Cygwin profile and make it the default.
+	if ($retval -and (WinGet-InstallPackage "9N0DX20HK701"))
+	{
+		$retval = WindowsTerminal-CygwinProfile
 	}
 	# Install Notepad++
-	$retval = $retval -and (WinGet-InstallPackage "Notepad++.Notepad++")
+	if ($retval -and $choice -eq 2)
+	{
+		$retval = WinGet-InstallPackage -update "Notepad++.Notepad++"
+	}
+	else
+	{
+		$retval = WinGet-InstallPackage "Notepad++.Notepad++"
+	}
 	#
 	if (-not$retval)
 	{

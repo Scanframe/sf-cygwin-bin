@@ -133,7 +133,7 @@ cp "${HOME}/bin/"{.bash_profile,.bashrc} "${HOME}/"
 
 **Install additional packages from the command-line**
 
-After a Cygwin restart all script from the script repository are ineffect and packages are now easily install using the `apt-cyg` script.
+After a Cygwin restart all script from the script repository are in effect and packages are now easily install using the `apt-cyg` script.
 To find a certain command/application for cygwin use the package finder [here](https://cygwin.com/cgi-bin2/package-grep.cgi "Pacakge search")
 So installing the `killall` command you need to install the `psmisc` package like this:
 
