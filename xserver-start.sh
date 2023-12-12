@@ -14,7 +14,7 @@ if ! command -v "XWin" > /dev/null ; then
 
 else
 	
-	xorg-server.sh &
+	xorg-server.sh
 	
 fi
 

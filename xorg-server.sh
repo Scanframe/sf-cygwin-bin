@@ -21,7 +21,9 @@ if [[ -z "${DISPLAY}" ]]; then
 fi	
 
 # Execute the X-server using the correct options not opening a TCP port.
-"${CMD_BIN}" "${DISPLAY}" -dpi 96 -ac -lesspointer -multiwindow -multimonitors -hostintitle -clipboard -noprimary -fp built-ins +bs -nounixkill -nowinkill -silent-dup-error -wgl
+# It is started using windows start, when not so the X-server wil stop with the bash shell.
+cmd /c start /B "${CMD_BIN}" "${DISPLAY}" -dpi 96 -ac -lesspointer -multiwindow -multimonitors -hostintitle -clipboard -noprimary -fp built-ins +bs -nounixkill -nowinkill -silent-dup-error -wgl
+
 
 # This option is set to make the Z-server open an TCP-port.
 # -listen tcp
