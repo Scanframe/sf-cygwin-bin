@@ -190,13 +190,31 @@ if (-not(WinGet-IsInstalled))
 	# Install WinGet using the Windows store.
 	Write-Host "Winget is NOT installed, starting the Windows store."
 	WinStore-Open "App Installer"
+	# Check if WinGet was installed from the store.
+	if (-not(WinGet-IsInstalled))
+	{
+		Write-Host "WinGet was not installed from the Windows Store, bailing out!"
+		Exit 1
+	}
 }
-
-# Check if WinGet was installed from the store.
-if (-not(WinGet-IsInstalled))
+# When installed check the minimal version.
+else
 {
-	Write-Host "WinGet was not installed from the Windows Store, bailing out!"
-	Exit 1
+	# Match the version string.
+	if (-not((& "${wingetexe}" --version) -match "^v(.+)$"))
+	{
+		Write-Host "Could not determine WinGet version, bailing out!"
+	}
+	else
+	{
+		$winget_ver = $matches[1];
+		Write-Host "Winget installed version '${winget_ver}'."
+		# Compare needed winget version with what is needed.
+		if ([System.Version]$winget_ver -lt [System.Version]"1.6.3133")
+		{
+			Write-Host "Winget version '${matches[1]}' less than '1.6.3133', upgrade winget first!"
+		}
+	}
 }
 
 # Installs Cygwin and configures it.
