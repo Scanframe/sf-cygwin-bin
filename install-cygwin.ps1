@@ -125,13 +125,14 @@ function Cygwin-WebInstall
 function WinGet-IsPackageInstalled
 {
 	param ([string]$appId)
-<#
+	Write-Debug "$( Get-FunctionName ): Checking if application with id '${appId}' is installed."
+	<#
 	# Get the list the installed app from the list.
 	$process = Start-Process -Wait -PassThru -Verb RunAs -FilePath $wingetexe -ArgumentList "list --accept-source-agreements --exact --id `"$appId`""
 	$exitcode = $process.ExitCode
 #>
 	# Get the list the installed app from the list.
-	(&"$wingetexe" list --exact --id "$appId") | Out-Null
+	(& "$wingetexe" list --disable-interactivity --accept-source-agreements --exact --id "$appId") | Out-Null
 	$exitcode = $LASTEXITCODE
 	# Get the exit code and return true when zero.
 	Write-Debug "$( Get-FunctionName ): Exitcode 0x$($exitcode.ToString("X") )"
@@ -157,7 +158,7 @@ function WinGet-InstallPackage
 	if (-not$result)
 	{
 		Write-Host "Installing '${appId}' ..."
-		&"$wingetexe" install --accept-source-agreements --accept-package-agreements --exact --id "$appId"
+		&"$wingetexe" install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "$appId"
 		$result = $LASTEXITCODE -eq 0
 		Write-Debug "$( Get-FunctionName ): Exitcode 0x$($LASTEXITCODE.ToString("X") )"
 		# Check for error 'APPINSTALLER_CLI_ERROR_SOURCE_AGREEMENTS_NOT_ACCEPTED'.
@@ -171,7 +172,7 @@ function WinGet-InstallPackage
 		if ($update)
 		{
 			Write-Host "Upgrading '${appId}' ..."
-			&"$wingetexe" update --exact --id "$appId"
+			& "$wingetexe" update --disable-interactivity --exact --id "$appId"
 			$result = $LASTEXITCODE -eq 0
 		}
 	}
@@ -291,6 +292,7 @@ function Cygwin-Configure
 			Copy-Item -Path "$binDir\.bashrc" -Destination $homeDir
 		}
 	}
+	Write-Debug "$( Get-FunctionName ): Cygwin user configuration done."
 	Return $True
 }
 
@@ -402,6 +404,7 @@ if ($choice -ne 0)
 	{
 		$retval = WindowsTerminal-CygwinProfile
 	}
+<#
 	# Install Notepad++
 	if ($retval -and $choice -eq 2)
 	{
@@ -411,6 +414,7 @@ if ($choice -ne 0)
 	{
 		$retval = WinGet-InstallPackage "Notepad++.Notepad++"
 	}
+#>
 	#
 	if (-not$retval)
 	{
