@@ -60,10 +60,10 @@ function Cygwin-WebInstall
 	$url = "https://www.cygwin.com/setup-x86_64.exe"
 	$setupExe = "$installDir\setup-x86_64.exe"
 	# When the installer already exists do nothing.
-	if ($update -or -not(Test-Path -Path $setupExe))
+	if ($update -or -not (Test-Path -Path $setupExe))
 	{
 		Write-Host "Installing Cygwin setup into: ${installDir}"
-		if (-not(Test-Path -Path $installDir))
+		if (-not (Test-Path -Path $installDir))
 		{
 			# Create directory when it does not exist.
 			New-Item -ItemType Directory -Path $installDir
@@ -83,7 +83,7 @@ function Cygwin-WebInstall
 		Write-Debug "$( Get-FunctionName ): Cygwin setup exists in: $installDir"
 	}
 	# When update is required do this step anyway.
-	if ($update -or -not(Test-Path -Path "${rootDir}/Cygwin.bat"))
+	if ($update -or -not (Test-Path -Path "${rootDir}/Cygwin.bat"))
 	{
 		# Start the Cygwin setup in unattended mode
 		$packages = @(
@@ -96,6 +96,7 @@ function Cygwin-WebInstall
 			"procps",
 			"libproc2-0",
 			"joe",
+			"vim",
 			"mc",
 			"xorg-server",
 			"xterm"
@@ -155,7 +156,7 @@ function WinGet-InstallPackage
 		[string]$appId
 	)
 	$result = (WinGet-IsPackageInstalled "$appId")
-	if (-not$result)
+	if (-not $result)
 	{
 		Write-Host "Installing '${appId}' ..."
 		&"$wingetexe" install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "$appId"
@@ -186,13 +187,13 @@ function WinGet-IsInstalled
 }
 
 # Check if WinGet is already installed
-if (-not(WinGet-IsInstalled))
+if (-not (WinGet-IsInstalled))
 {
 	# Install WinGet using the Windows store.
 	Write-Host "Winget is NOT installed, starting the Windows store."
 	WinStore-Open "App Installer"
 	# Check if WinGet was installed from the store.
-	if (-not(WinGet-IsInstalled))
+	if (-not (WinGet-IsInstalled))
 	{
 		Write-Host "WinGet was not installed from the Windows Store, bailing out!"
 		Exit 1
@@ -202,7 +203,7 @@ if (-not(WinGet-IsInstalled))
 else
 {
 	# Match the version string.
-	if (-not((& "${wingetexe}" --version) -match "^v(.+)$"))
+	if (-not ((& "${wingetexe}" --version) -match "^v(.+)$"))
 	{
 		Write-Host "Could not determine WinGet version, bailing out!"
 	}
@@ -228,7 +229,7 @@ function Cygwin-Configure
 	$homeDir = "${env:USERPROFILE}\cygwin"
 	$binDir = "${env:USERPROFILE}\cygwin\bin"
 	$line = "db_home: /cygdrive/c/Users/%u/cygwin"
-	if (-not(Test-Path -Path $filePath))
+	if (-not (Test-Path -Path $filePath))
 	{
 		Write-Host "File '$filePath' not found to append!"
 		Return $False
@@ -246,7 +247,7 @@ function Cygwin-Configure
 		Write-Host "Line for home directory already exists in file '$filePath'."
 	}
 	# Create cygwin home directory when it does not exist.
-	if (-not(Test-Path -Path $homeDir))
+	if (-not (Test-Path -Path $homeDir))
 	{
 		Write-Host "Creating home directory '$homeDir'."
 		New-Item -ItemType Directory -Path $homeDir
@@ -256,7 +257,7 @@ function Cygwin-Configure
 		Write-Host "Home directory '$homeDir' exists."
 	}
 	# Create cygwin home directory when it does not exist.
-	if (-not(Test-Path -Path $binDir))
+	if (-not (Test-Path -Path $binDir))
 	{
 		Write-Host "Cloning 'bin' repository to create '${homeDir}\bin' directory."
 		& "${rootDir}\bin\bash" --login -c "/usr/bin/git clone ${repoCygwinBin} ~/bin"
@@ -281,12 +282,12 @@ function Cygwin-Configure
 	if (Test-Path -Path $binDir)
 	{
 		Write-Host "Checking profile files in '$homeDir'."
-		if (-not(Test-Path -Path "${homeDir}\.bash_profile"))
+		if (-not (Test-Path -Path "${homeDir}\.bash_profile"))
 		{
 			Write-Host "Copying '.bash_profile'."
 			Copy-Item -Path "$binDir\.bash_profile" -Destination $homeDir
 		}
-		if (-not(Test-Path -Path "${homeDir}\.bashrc"))
+		if (-not (Test-Path -Path "${homeDir}\.bashrc"))
 		{
 			Write-Host "Copying '.bashrc'."
 			Copy-Item -Path "$binDir\.bashrc" -Destination $homeDir
@@ -296,13 +297,59 @@ function Cygwin-Configure
 	Return $True
 }
 
+# Fix for allowing winget to install from the msstore.
+function FixWingetMicrosoftStore
+{
+	$keyLocationLong = "HKEY_LOCAL_MACHINE"
+	$keyLocationShort = "HKLM:"
+	$keyPath = '\SOFTWARE\Policies\Microsoft\Windows\AppInstaller'
+	$keyName = 'EnableBypassCertificatePinningForMicrosoftStore'
+	$value = Get-ItemPropertyValue -Path "${keyLocationShort}${keyPath}" -Name $keyName -ErrorAction SilentlyContinue
+	if ($value -eq $null)
+	{
+		Write-Host "Key '${keyLocationShort}${keyPath} ${keyName}' does not exist yet."
+		# This command needs elevation and is not possible in a simple way.
+		#New-ItemProperty -Path $key -Name $keyName -Value 1 -PropertyType DWORD -Force
+		# Create a temporary file.
+		$regFilePath = New-TemporaryFile
+		# Write a registry file to be imported using regedit.
+		Out-File -FilePath $regFilePath -Encoding UTF8 -InputObject @"
+Windows Registry Editor Version 5.00
+
+[${keyLocationLong}${keyPath}]
+"${keyName}"=dword:00000001
+
+"@
+		Write-Host "Creation of registry key to enable installing from the Microsoft Store using Winget."
+		# Run the registry editor to import the given file.
+		$process = Start-Process -Wait -PassThru -Verb RunAs -FilePath regedit.exe -ArgumentList "/s ${regFilePath}"
+		# Signal success or failure.
+		if ($process.ExitCode -ne 0)
+		{
+			Return $False
+		}
+		# Check if the key was created properly.
+		$value = Get-ItemPropertyValue -Path "${keyLocationShort}${keyPath}" -Name $keyName -ErrorAction SilentlyContinue
+		if ($value -ne 1)
+		{
+			Write-Host "Registry key failed to create."
+			Return $False
+		}
+		Write-Host "Registry key '${keyLocationShort}${keyPath}>${keyName}' is created."
+		Return $True
+	}
+	Write-Host "Registry key '${keyLocationShort}${keyPath}>${keyName}' already exists."
+	Return $True
+}
+
+
 # Add a Cygwin profile to the Windows Terminal settings JSON-file.
 function WindowsTerminal-CygwinProfile
 {
 	# Settings file used by the terminal.
 	$filepath = "${env:LOCALAPPDATA}\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 	# Check if the settings file exists.
-	if (-not(Test-Path -Path $filepath))
+	if (-not (Test-Path -Path $filepath))
 	{
 		@'
 #################################################
@@ -315,14 +362,14 @@ function WindowsTerminal-CygwinProfile
 		# Run the terminal to let the app create the settings.json file.
 		Start-Process -Wait -PassThru -NoNewWindow -FilePath "wt.exe" -ArgumentList "--version"
 		# Check for the 2nd time.
-		if (-not(Test-Path -Path $filepath))
+		if (-not (Test-Path -Path $filepath))
 		{
 			Write-Error "Windows Terminal settings file not found '${filepath}'!"
 			Return $False
 		}
 	}
 	# Created a saved copy whenit does not exists yet.
-	if (-not(Test-Path -Path "${filepath}-saved"))
+	if (-not (Test-Path -Path "${filepath}-saved"))
 	{
 		Write-Debug "$( Get-FunctionName ): Creating saved copy of Terminal settings file."
 		Copy-Item -Path $filepath -Destination "${filepath}-saved"
@@ -390,22 +437,27 @@ if ($choice -ne 0)
 	{
 		$retval = Cygwin-Configure
 	}
+	# Fix the winget for installing from the Microsoft Store.
+	if ($retval)
+	{
+		$retval = FixWingetMicrosoftStore
+	}
 	# Install the multi tab Windows terminal.
 	if ($retval -and $choice -eq 2)
 	{
-		$retval = WinGet-InstallPackage -update "9N0DX20HK701"
+		$retval = WinGet-InstallPackage -update "Microsoft.WindowsTerminal"
 	}
 	else
 	{
-		$retval = WinGet-InstallPackage "9N0DX20HK701"
+		$retval = WinGet-InstallPackage "Microsoft.WindowsTerminal"
 	}
 	# Add the Cygwin profile and make it the default.
-	if ($retval -and (WinGet-InstallPackage "9N0DX20HK701"))
+	if ($retval -and (WinGet-IsPackageInstalled "Microsoft.WindowsTerminal"))
 	{
 		$retval = WindowsTerminal-CygwinProfile
 	}
 <#
-	# Install Notepad++
+	# The notepad++ shell script installs it when not present.
 	if ($retval -and $choice -eq 2)
 	{
 		$retval = WinGet-InstallPackage -update "Notepad++.Notepad++"
@@ -416,14 +468,15 @@ if ($choice -ne 0)
 	}
 #>
 	#
-	if (-not$retval)
+	if (-not $retval)
 	{
 		Write-Error "Failed installing!"
-		exit 1
+		Exit 1
 	}
-	exit 0
+	Exit 0
 }
 else
 {
 	Write-Host 'Cygwin installation is cancelled.'
 }
+

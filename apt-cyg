@@ -23,9 +23,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-if [ ${BASH_VERSINFO}${BASH_VERSINFO[1]} -lt 42 ]
+if [ "${BASH_VERSINFO[0]}${BASH_VERSINFO[1]}" -lt 42 ]
 then
-  echo 'Bash version 4.2+ required'
+  echo "Bash version 4.2+ required"
   exit
 fi
 
@@ -123,7 +123,7 @@ function wget {
   then
     command wget "$@"
   else
-    warn wget is not installed, using lynx as fallback
+    warn "wget is not installed, using lynx as fallback"
     set "${*: -1}"
     lynx -source "$1" > "${1##*/}"
   fi
@@ -154,8 +154,8 @@ function find-workspace {
   s : %3a g
   ' <<< "$mirror")
 
-  mkdir -p "$cache/$mirrordir/$arch"
-  cd "$cache/$mirrordir/$arch"
+  mkdir -p "${cache}/${mirrordir}/${arch}"
+  cd "${cache}/${mirrordir}/${arch}" || exit 1
   if [ -e setup.ini ]
   then
     return 0
@@ -168,14 +168,14 @@ function find-workspace {
 function get-setup {
   touch setup.ini
   mv setup.ini setup.ini-save
-  wget -N $mirror/$arch/setup.bz2
+  wget -N "${mirror}/${arch}/setup.bz2"
   if [ -e setup.bz2 ]
   then
     bunzip2 setup.bz2
     mv setup setup.ini
-    echo Updated setup.ini
+    echo "Updated 'setup.ini'"
   else
-    echo Error updating setup.ini, reverting
+    echo "Error updating 'setup.ini', reverting"
     mv setup.ini-save setup.ini
   fi
 }
@@ -185,7 +185,7 @@ function check-packages {
   then
     return 0
   else
-    echo No packages found.
+    echo "No packages found."
     return 1
   fi
 }
@@ -221,10 +221,10 @@ function apt-list {
   local sbq
   for pkg in "${pks[@]}"
   do
-    let sbq++ && echo
+    (( sbq++ )) && echo
     awk 'NR>1 && $1~pkg && $0=$1' pkg="$pkg" /etc/setup/installed.db
   done
-  let sbq && return
+  (( sbq )) && return
   awk 'NR>1 && $0=$1' /etc/setup/installed.db
 }
 
@@ -234,7 +234,7 @@ function apt-listall {
   local sbq
   for pkg in "${pks[@]}"
   do
-    let sbq++ && echo
+    (( sbq++ )) && echo
     awk '$1~pkg && $0=$1' RS='\n\n@ ' FS='\n' pkg="$pkg" setup.ini
   done
 }
@@ -283,7 +283,7 @@ function apt-depends {
     $1 == "@" {
       apg = $2
     }
-    $1 == "requires:" {
+    $1 == "depends2:" {
       for (z=2; z<=NF; z++)
         reqs[apg][z-1] = $z
     }
@@ -317,7 +317,7 @@ function apt-rdepends {
     $1 == "@" {
       apg = $2
     }
-    $1 == "requires:" {
+    $1 == "depends2:" {
       for (z=2; z<=NF; z++)
         reqs[$z][length(reqs[$z])+1] = apg
     }
@@ -354,29 +354,29 @@ function apt-download {
 }
 
 function download {
-  local pkg digest digactual
+  local pkg digest
   pkg=$1
   # look for package and save desc file
 
-  awk '$1 == pc' RS='\n\n@ ' FS='\n' pc=$pkg setup.ini > desc
+  awk '$1 == pc' RS='\n\n@ ' FS='\n' pc="${pkg}" setup.ini > desc
   if [ ! -s desc ]
   then
-    echo Unable to locate package $pkg
+    echo "Unable to locate package '$pkg'"
     exit 1
   fi
 
   # download and unpack the bz2 or xz file
 
   # pick the latest version, which comes first
-  set -- $(awk '$1 == "install:"' desc)
+  set -- "$(awk '$1 == "install:"' desc)"
   if (( ! $# ))
   then
-    echo 'Could not find "install" in package description: obsolete package?'
+    echo "Could not find 'install in package description: obsolete package?"
     exit 1
   fi
 
-  dn=$(dirname $2)
-  bn=$(basename $2)
+  dn=$(dirname "${2}")
+  bn=$(basename "${2}")
 
   # check the md5
   digest=$4
@@ -384,47 +384,47 @@ function download {
    32) hash=md5sum    ;;
   128) hash=sha512sum ;;
   esac
-  mkdir -p "$cache/$mirrordir/$dn"
-  cd "$cache/$mirrordir/$dn"
-  if ! test -e $bn || ! $hash -c <<< "$digest $bn"
+  mkdir -p "${cache}/${mirrordir}/${dn}"
+  cd "${cache}/${mirrordir}/${dn}" || exit 1
+  if ! test -e "${bn}" || ! $hash -c <<< "${digest} ${bn}"
   then
-    wget -O $bn $mirror/$dn/$bn
-    $hash -c <<< "$digest $bn" || exit
+    wget -O "${bn}" "${mirror}/${dn}/${bn}"
+    $hash -c <<< "${digest} ${bn}" || exit
   fi
 
-  tar tf $bn | gzip > /etc/setup/"$pkg".lst.gz
-  cd ~-
-  mv desc "$cache/$mirrordir/$dn"
-  echo $dn $bn > /tmp/dwn
+  tar tf "${bn}" | gzip > "/etc/setup/${pkg}.lst.gz"
+  cd ~- || exit 1
+  mv desc "${cache}/${mirrordir}/${dn}"
+  echo "${dn} ${bn}" > /tmp/dwn
 }
 
 function apt-search {
   check-packages
-  echo Searching downloaded packages...
+  echo "Searching downloaded packages..."
   for pkg in "${pks[@]}"
   do
     key=$(type -P "$pkg" | sed s./..)
-    [[ $key ]] || key=$pkg
+    [[ $key ]] || key="${pkg}"
     for manifest in /etc/setup/*.lst.gz
     do
-      if gzip -cd $manifest | grep -q "$key"
+      if gzip -cd "${manifest}" | grep -q "${key}"
       then
         package=$(sed '
         s,/etc/setup/,,
         s,.lst.gz,,
-        ' <<< $manifest)
-        echo $package
+        ' <<< "${manifest}")
+        echo "${package}"
       fi
     done
   done
 }
 
 function apt-searchall {
-  cd /tmp
+  cd /tmp || exit 1
   for pkg in "${pks[@]}"
   do
-    printf -v qs 'text=1&arch=%s&grep=%s' $arch "$pkg"
-    wget -O matches cygwin.com/cgi-bin2/package-grep.cgi?"$qs"
+    printf -v qs 'text=1&arch=%s&grep=%s' "${arch}" "${pkg}"
+    wget -O matches cygwin.com/cgi-bin2/package-grep.cgi?"${qs}"
     awk '
     NR == 1 {next}
     mc[$1]++ {next}
@@ -442,20 +442,20 @@ function apt-install {
   for pkg in "${pks[@]}"
   do
 
-  if grep -q "^$pkg " /etc/setup/installed.db
+  if grep -q "^${pkg} " /etc/setup/installed.db
   then
-    echo Package $pkg is already installed, skipping
+    echo "Package '${pkg}' is already installed, skipping"
     continue
   fi
   (( sbq++ )) && echo
-  echo Installing $pkg
+  echo "Installing '${pkg}'"
 
-  download $pkg
-  read dn bn </tmp/dwn
-  echo Unpacking...
+  download "${pkg}"
+  read -r dn bn </tmp/dwn
+  echo "Unpacking..."
 
-  cd "$cache/$mirrordir/$dn"
-  tar -x -C / -f $bn
+  cd "${cache}/${mirrordir}/${dn}" || exit 1
+  tar -x -C / -f "${bn}"
   # update the package database
 
   awk '
@@ -467,68 +467,72 @@ function apt-install {
   END {
     if (ins != 1) print pkg, bz, 0
   }
-  ' pkg="$pkg" bz=$bn /etc/setup/installed.db > /tmp/awk.$$
+  ' pkg="${pkg}" bz="${bn}" /etc/setup/installed.db > /tmp/awk.$$
   mv /etc/setup/installed.db /etc/setup/installed.db-save
   mv /tmp/awk.$$ /etc/setup/installed.db
 
   [ -v nodeps ] && continue
   # recursively install required packages
+  # Broken since 'depends2:' field.
+  #requires=$(awk '$1=="requires", $0=$2' FS=': ' desc)
 
-  requires=$(awk '$1=="requires", $0=$2' FS=': ' desc)
-  cd ~-
+  echo "Recursively install required packages..."
+  requires=$(awk '/depends2:/ {sub(/^depends2: /, "");gsub(", ", " ");print;exit}' desc)
+  
+  cd ~- || exit 1
   wr=0
   if [[ $requires ]]
   then
-    echo Package $pkg requires the following packages, installing:
-    echo $requires
+    echo "Package '$pkg' requires the following packages, installing:"
+    echo "  ${requires}"
     for package in $requires
     do
       if grep -q "^$package " /etc/setup/installed.db
       then
-        echo Package $package is already installed, skipping
+        echo "Package '$package' is already installed, skipping"
         continue
       fi
-      apt-cyg install --noscripts $package || (( wr++ ))
+      apt-cyg install --noscripts "${package}" || (( wr++ ))
     done
   fi
   if (( wr ))
   then
-    echo some required packages did not install, continuing
+    echo "Some required packages did not install, continuing"
   fi
 
-  # run all postinstall scripts
+  # run all post-install scripts
 
   [ -v noscripts ] && continue
-  find /etc/postinstall -name '*.sh' | while read script
+  find /etc/postinstall -name '*.sh' | while read -r script
   do
-    echo Running $script
+    echo "Running '$script' ..."
     $script
-    mv $script $script.done
+    mv "${script}" "${script}.done"
   done
-  echo Package $pkg installed
+  echo "Package '$pkg' installed"
 
   done
 }
 
 function apt-remove {
   check-packages
-  cd /etc
+  cd /etc || exit 1
   cygcheck awk bash bunzip2 grep gzip mv sed tar xz > setup/essential.lst
   for pkg in "${pks[@]}"
   do
 
   if ! grep -q "^$pkg " setup/installed.db
   then
-    echo Package $pkg is not installed, skipping
+    echo "Package '$pkg' is not installed, skipping"
     continue
   fi
 
-  if [ ! -e setup/"$pkg".lst.gz ]
+  if [ ! -e "setup/${pkg}.lst.gz" ]
   then
-    warn Package manifest missing, cannot remove $pkg. Exiting
+    warn "Package manifest missing, cannot remove '${pkg}'. Exiting"
     exit 1
   fi
-  gzip -dk setup/"$pkg".lst.gz
+  gzip -dk "setup/${pkg}.lst.gz"
   awk '
   NR == FNR {
     if ($NF) ess[$NF]
@@ -537,11 +541,11 @@ function apt-remove {
   $NF in ess {
     exit 1
   }
-  ' FS='[/\\\\]' setup/{essential,$pkg}.lst
+  ' FS='[/\\\\]' setup/{essential,"${pkg}"}.lst
   esn=$?
   if [ $esn = 0 ]
   then
-    echo Removing $pkg
+    echo "Removing '$pkg' ..."
     if [ -e preremove/"$pkg".sh ]
     then
       preremove/"$pkg".sh
@@ -550,20 +554,20 @@ function apt-remove {
     mapfile dt < setup/"$pkg".lst
     for each in ${dt[*]}
     do
-      [ -f /$each ] && rm /$each
+      [ -f "/${each}" ] && rm "/${each}"
     done
     for each in ${dt[*]}
     do
-      [ -d /$each ] && rmdir --i /$each
+      [ -d "/${each}" ] && rmdir --i "/${each}"
     done
     rm -f setup/"$pkg".lst.gz postinstall/"$pkg".sh.done
     awk -i inplace '$1 != ENVIRON["pkg"]' setup/installed.db
-    echo Package $pkg removed
+    echo "Package '$pkg' removed"
   fi
-  rm setup/"$pkg".lst
+  rm "setup/${pkg}.lst"
   if [ $esn = 1 ]
   then
-    warn apt-cyg cannot remove package $pkg, exiting
+    warn "apt-cyg cannot remove package '$pkg', exiting"
     exit 1
   fi
 
@@ -580,7 +584,7 @@ function apt-mirror {
       print "\t" pks
     }
     ' pks="$pks" /etc/setup/setup.rc
-    echo Mirror set to "$pks".
+    echo "Mirror set to '$pks'."
   else
     awk '
     /last-mirror/ {
@@ -602,7 +606,7 @@ function apt-cache {
       print "\t" vas
     }
     ' vas="${vas//\\/\\\\}" /etc/setup/setup.rc
-    echo Cache set to "$vas".
+    echo "Cache set to '$vas'."
   else
     awk '
     /last-cache/ {
@@ -634,7 +638,7 @@ do
     ;;
 
     --version)
-      printf "$version"
+      echo "${version}"
       exit
     ;;
 
@@ -664,10 +668,10 @@ done
 
 set -a
 
-if type -t apt-$command | grep -q function
+if type -t "apt-${command}" | grep -q function
 then
   readonly arch=${HOSTTYPE/i6/x}
-  apt-$command
+  "apt-${command}"
 else
-  printf "$usage"
+  echo "${usage}"
 fi

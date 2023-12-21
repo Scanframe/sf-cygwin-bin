@@ -3,8 +3,8 @@
 CMD_PATH="$(cygpath -u "${PROGRAMFILES}\\Notepad++\\notepad++.exe")"
 # Check if the command exists.
 if ! command -v "${CMD_PATH}" 2>&1 /dev/null ; then
-	echo "Notepad++ not installed at: ${CMD_PATH}"
-  echo "Download from here: https://notepad-plus-plus.org/"
+	echo "Installing Notepad++ not installed at: ${CMD_PATH}"
+	winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "Notepad++.Notepad++"
 else
 	# Run the command in the background by default.
 	"${CMD_PATH}" "$@" &

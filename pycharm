@@ -20,7 +20,7 @@ else
 	echo "Could not find a PyCharm installation!"
 	read -r -p "Install PyCharm using WinGet? [y/N] " response
 	if [[ "$response" =~ ^[yY]$ ]]; then
-		winget install -e --id JetBrains.PyCharm.Communit
+		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id JetBrains.PyCharm.Communit
 	fi
 	exit 1
 fi

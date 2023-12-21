@@ -7,15 +7,19 @@ if [ -z "$1" ]; then
 
 fi
 
-OPTIONS="--one-file-system --dereference-args --si --max-depth ${1}"
+OPTIONS=("--one-file-system" "--dereference-args" "--si")
+OPTIONS+=("--max-depth" "${1}")
+
+# When no depth is passed only show the total.
 if [ $1 != 0 ]; then
-	OPTIONS="--total ${OPTIONS}"
+	OPTIONS+=("--total")
 fi
 
+# Add the directory when passed or not.
 if [ -z "$2" ]; then
-	DIR="$(pwd)"
+	OPTIONS+=("$(pwd)")
 else
-	DIR="${2}"
+	OPTIONS+=("${2}")
 fi
 
-exec du ${OPTIONS} "${DIR}" | sort -h
+du "${OPTIONS[@]}" | sort -h
