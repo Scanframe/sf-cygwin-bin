@@ -367,8 +367,9 @@ function download {
 
   # download and unpack the bz2 or xz file
 
-  # pick the latest version, which comes first
-  set -- "$(awk '$1 == "install:"' desc)"
+  # pick the latest version, which comes first ()
+  # shellcheck disable=SC2046 # Do not quote this awk command since it will break the function.
+  set -- $(awk '$1 == "install:"' desc)
   if (( ! $# ))
   then
     echo "Could not find 'install in package description: obsolete package?"
@@ -379,17 +380,17 @@ function download {
   bn=$(basename "${2}")
 
   # check the md5
-  digest=$4
-  case ${#digest} in
+  digest="$4"
+  case "${#digest}" in
    32) hash=md5sum    ;;
   128) hash=sha512sum ;;
   esac
   mkdir -p "${cache}/${mirrordir}/${dn}"
   cd "${cache}/${mirrordir}/${dn}" || exit 1
-  if ! test -e "${bn}" || ! $hash -c <<< "${digest} ${bn}"
+  if ! test -e "${bn}" || ! "${hash}" -c <<< "${digest} ${bn}"
   then
     wget -O "${bn}" "${mirror}/${dn}/${bn}"
-    $hash -c <<< "${digest} ${bn}" || exit
+    "${hash}" -c <<< "${digest} ${bn}" || exit
   fi
 
   tar tf "${bn}" | gzip > "/etc/setup/${pkg}.lst.gz"
