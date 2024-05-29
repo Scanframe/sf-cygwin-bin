@@ -94,6 +94,7 @@ function Cygwin-WebInstall
 			"jq",
 			"psmisc", # For killall
 			"procps",
+			"procps-ng",
 			"libproc2-0",
 			"joe",
 			"vim",
