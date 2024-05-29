@@ -15,7 +15,7 @@ else
 	echo "Could not find a CLion installation!"
 	read -r -p "Install CLion using WinGet? [y/N] " response
 	if [[ "$response" =~ ^[yY]$ ]]; then
-		winget --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id JetBrains.CLion
+		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id JetBrains.CLion
 	fi
 	exit 1
 fi
