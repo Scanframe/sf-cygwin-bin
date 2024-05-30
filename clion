@@ -6,8 +6,11 @@ CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion
 if [[ -z "${CLION_BIN_DIR}" ]]; then
 	# shellcheck disable=SC2154
 	CLION_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")/JetBrains/CLion"*/bin 2> /dev/null)"
+	if [[ ! -d "${CLION_BIN_DIR}" ]] ; then
+		CLION_BIN_DIR="$(ls -d "$(cygpath -u "${PROGRAMFILES} (x86)")/JetBrains/CLion"*/bin 2> /dev/null)"
+	fi
 fi
-# Check if the CLion directory exists.
+# Check if the CLion directory exists was found.
 if [[ -d "${CLION_BIN_DIR}" ]] ; then
 	export PATH="${PATH}:${CLION_BIN_DIR}/mingw/bin"
 	cygstart --directory="${CLION_BIN_DIR}" clion64.exe "$@"

@@ -19,6 +19,8 @@ QTLIBDIR="$(qt-lib-dir.sh)"
 if [[ ! -z "${QTLIBDIR}" ]]; then
 	# Get the directory which is needed for QT apps to find the appropriate DLL's.
 	QTBINDIR="${QTLIBDIR}/mingw_64/bin"
+	# Form the Qt Tool directory from the found Qt directory.
+	QTTOOLDIR="$(realpath "${QTLIBDIR}/../Tools")"
 	#
 	# Find the QT bin directory in the user PATH environment variable.
 	#
@@ -38,9 +40,9 @@ if [[ ! -z "${QTLIBDIR}" ]]; then
 	# Only when needed add the Qt library.
 	if ${flag}; then
 		echo "Adding found Qt library '${QTLIBDIR}' into path."
-		setx PATH "${path_cur}$(cygpath -w "${QTBINDIR}");"
+		setx PATH "${path_cur}$(cygpath -w "${QTBINDIR}");$(cygpath -w "${QTTOOLDIR}/CMake_64/bin");$(cygpath -w "${QTTOOLDIR}/Ninja");.\\lib"
 		# Update current shell session PATH as well because 'setx' only works for new processes.
-		export PATH="${PATH}:${QTBINDIR}"
+		export PATH="${PATH}:${QTBINDIR}:${QTTOOLDIR}/CMake_64/bin:${QTTOOLDIR}/Ninja:./lib"
 	fi
 fi
 
