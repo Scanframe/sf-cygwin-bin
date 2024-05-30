@@ -91,16 +91,19 @@ function Cygwin-WebInstall
 			"wget",
 			"openssh",
 			"bash-completion",
-			"jq",
-			"psmisc", # For killall
-			"procps",
-			"procps-ng",
-			"libproc2-0",
+			"xorg-server",
 			"joe",
 			"vim",
 			"mc",
-			"xorg-server",
-			"xterm"
+			"xterm",
+			"psmisc",
+			"procps",
+			"procps-ng",
+			"libproc2-0",
+			# Needed for building CMake projects using shell script.
+			"jq",
+			"dialog",
+			"perl-Image-ExifTool"
 		)
 		$arguments = @(
 			"--no-admin",

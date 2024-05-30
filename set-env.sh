@@ -21,6 +21,8 @@ if [[ ! -z "${QTLIBDIR}" ]]; then
 	QTBINDIR="${QTLIBDIR}/mingw_64/bin"
 	# Form the Qt Tool directory from the found Qt directory.
 	QTTOOLDIR="$(realpath "${QTLIBDIR}/../Tools")"
+	# Form the Qt Tool directory from the found Qt directory.
+	NSISDIR="$(realpath "${QTLIBDIR}/../../NSIS/Bin")"
 	#
 	# Find the QT bin directory in the user PATH environment variable.
 	#
@@ -40,9 +42,9 @@ if [[ ! -z "${QTLIBDIR}" ]]; then
 	# Only when needed add the Qt library.
 	if ${flag}; then
 		echo "Adding found Qt library '${QTLIBDIR}' into path."
-		setx PATH "${path_cur}$(cygpath -w "${QTBINDIR}");$(cygpath -w "${QTTOOLDIR}/CMake_64/bin");$(cygpath -w "${QTTOOLDIR}/Ninja");.\\lib"
+		setx PATH "${path_cur}$(cygpath -w "${QTBINDIR}");$(cygpath -w "${QTTOOLDIR}/CMake_64/bin");$(cygpath -w "${QTTOOLDIR}/Ninja");.\\lib;$(cygpath -w "${NSISDIR}")"
 		# Update current shell session PATH as well because 'setx' only works for new processes.
-		export PATH="${PATH}:${QTBINDIR}:${QTTOOLDIR}/CMake_64/bin:${QTTOOLDIR}/Ninja:./lib"
+		export PATH="${PATH}:${QTBINDIR}:${QTTOOLDIR}/CMake_64/bin:${QTTOOLDIR}/Ninja:./lib:${NSISDIR}"
 	fi
 fi
 
