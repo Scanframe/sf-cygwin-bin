@@ -20,11 +20,12 @@ done
 
 # List of Cygwin packages to install.
 cg_pkgs=(
-	dialog
-	recode
-	doxygen
-	perl-Image-ExifTool
-	pcre
+	"dialog"
+	"recode"
+	"doxygen"
+	"perl-Image-ExifTool"
+	"pcre"
+	"jq"
 )
 
 for pkg in "${cg_pkgs[@]}"; do

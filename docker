@@ -1,12 +1,17 @@
 #!/bin/env bash
 
+# Get the script directory.
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+# Include WriteLog function.
+source "${SCRIPT_DIR}/inc/WriteLog.sh"
+
 # Assemble the command path for Docker
 CMD_PATH="$(cygpath -u "${PROGRAMFILES}\\Docker\\Docker\\resources\\bin\\docker.exe")"
 # Check if the command exists.
 if ! command -v "${CMD_PATH}" >/dev/null ; then
-	echo "Installing Docker, not installed at: ${CMD_PATH}"
+	WriteLog "-Installing Docker, not installed at: ${CMD_PATH}"
 	winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "Docker.DockerDesktop"
 else
 	# Run the command in the background by default.
-	"${CMD_PATH}" "$@" &
+	"${CMD_PATH}" "$@"
 fi

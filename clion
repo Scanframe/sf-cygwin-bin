@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Get the script directory.
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+# Include WriteLog function.
+source "${SCRIPT_DIR}/inc/WriteLog.sh"
+
 # Check if CLion is installed in the users 'lib' directory.
 CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
 # Check if CLion is installed in users 'lib' directory.
@@ -11,10 +16,10 @@ fi
 if [[ -d "${CLION_BIN_DIR}" ]] ; then
 	cygstart --directory="${CLION_BIN_DIR}" clion64.exe "$@"
 else
-	echo "Could not find a CLion installation!"
+	WriteLog "Could not find a CLion installation!"
 	read -r -p "Install CLion using WinGet? [y/N] " response
 	if [[ "$response" =~ ^[yY]$ ]]; then
-		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id JetBrains.CLion
+		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "JetBrains.CLion"
 	fi
 	exit 1
 fi
