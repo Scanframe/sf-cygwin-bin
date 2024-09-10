@@ -24,7 +24,7 @@
 	command -v exiftool >/dev/null && echo -e "Exif-Tool:$(exiftool -ver)"
 	command -v dpkg >/dev/null && echo -e "Dpkg:$(dpkg --version | head -n 1 | cut -d' ' -f7)"
 	command -v rpm >/dev/null && echo -e "RPM:$(rpm --version | grep -o '[^ ]*$')"
-	command -v java >/dev/null && echo -e "OpenJDK:$(java --version 2>/dev/null | head -n 1 | cut -d' ' -f2)"
+	command -v java >/dev/null && echo -e "Java:$( java -version 2>&1 | head -n 1 | cut -d' ' -f3 | tr -d '"')"
 	command -v bindfs >/dev/null && echo -e "BindFS:$(bindfs --version | grep -o '[^ ]*$')"
 	command -v fuse-zip >/dev/null && echo -e "Fuse-ZIP:$(fuse-zip --version 2>&1 | head -n 1 | cut -d' ' -f3)"
 	command -v jq >/dev/null && echo -e "JQ:$(jq --version | cut -d'-' -f2)"
