@@ -7,10 +7,12 @@ source "${SCRIPT_DIR}/inc/WriteLog.sh"
 
 # Check if CLion is installed in the users 'lib' directory.
 CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
-# Check if CLion is installed in users 'lib' directory.
-if [[ -z "${CLION_BIN_DIR}" ]]; then
-	# shellcheck disable=SC2154
+# Check if CLion is installed in application directory.
+if [[ -n "${CLION_BIN_DIR}" ]]; then
 	CLION_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")"*/JetBrains/CLion*/bin 2> /dev/null)"
+else
+	# Check if CLion is installed on a drive.
+	CLION_BIN_DIR="$(ls -d /cygdrive/*/clion/bin | head -n 1)"
 fi
 # Check if the CLion directory exists was found.
 if [[ -d "${CLION_BIN_DIR}" ]] ; then
