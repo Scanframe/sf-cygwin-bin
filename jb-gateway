@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Get the script directory.
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+# Include WriteLog function.
+source "${SCRIPT_DIR}/inc/WriteLog.sh"
+
+# Check if CLion is installed in the users 'lib' directory.
+BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
+# Check if CLion is installed in application directory.
+if [[ -n "${BIN_DIR}" ]]; then
+	BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")"*/JetBrains/CLion*/bin 2> /dev/null)"
+else
+	# Check if CLion is installed on a drive.
+	BIN_DIR="$(ls -d /cygdrive/*/JetBrainsGateway/bin | head -n 1)"
+fi
+# Check if the CLion directory exists was found.
+if [[ -d "${BIN_DIR}" ]] ; then
+	cygstart --directory="${BIN_DIR}" gateway64.exe "$@"
+else
+	WriteLog "Could not find an installation!"
+	read -r -p "Install Gateway using WinGet? [y/N] " response
+	if [[ "$response" =~ ^[yY]$ ]]; then
+		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "JetBrains.Gateway"
+	fi
+	exit 1
+fi

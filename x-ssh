@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Bailout when no arguments are passed.
-if [ $# -ne 1 ] ; then
+if [ $# -eq 0 ] ; then
 	echo "Is like 'ssh <user@server>' but passes the needed arguments for starting X-apps on the local X-server."
 	exit 1
 fi
@@ -9,7 +9,7 @@ fi
 # Check which X-server is running since the XWin server from Cygwin does not listen on a tcp-port but a socket.
 if pidof XWin >/dev/null ; then
 	# Run the ssh command passing the DISPLAY environment variable.
-	ssh $* -Y -t "XCURSOR_SIZE=16 KDE_FULL_SESSION=true /bin/bash --login -i"
+	ssh "$@" -Y -t "XCURSOR_SIZE=16 KDE_FULL_SESSION=true /bin/bash --login -i"
 	
 else	
 	# Get the VirtualBox Host-Only Ethernet Adapter IP address and only from the first one when more exist.
@@ -19,6 +19,6 @@ else
 		echo "The VirtualBox Host-Only Ethernet Adapter IP-address was not found!"
 	else
 		# Run the ssh command passing the DISPLAY environment variable.
-		ssh $* -t "DISPLAY=${IP_HOST_ONLY}${DISPLAY} XCURSOR_SIZE=16 KDE_FULL_SESSION=true /bin/bash --login -c"
+		ssh "$@" -t "DISPLAY=${IP_HOST_ONLY}${DISPLAY} XCURSOR_SIZE=16 KDE_FULL_SESSION=true /bin/bash --login -c"
 	fi	
 fi
