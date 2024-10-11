@@ -8,9 +8,12 @@ source "${SCRIPT_DIR}/inc/WriteLog.sh"
 # Assemble the command path for Docker
 CMD_PATH="$(cygpath -u "${PROGRAMFILES}\\Docker\\Docker\\resources\\bin\\docker.exe")"
 # Check if the command exists.
-if ! command -v "${CMD_PATH}" >/dev/null ; then
-	WriteLog "-Installing Docker, not installed at: ${CMD_PATH}"
-	winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "Docker.DockerDesktop"
+if ! command -v "${CMD_PATH}" >/dev/null; then
+	read -r -p "Install Docker using WinGet? [y/N] " response
+	if [[ "$response" =~ ^[yY]$ ]]; then
+		WriteLog "-Installing Docker, not installed at: ${CMD_PATH}"
+		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "Docker.DockerDesktop"
+	fi
 else
 	# Run the command in the background by default.
 	"${CMD_PATH}" "$@"

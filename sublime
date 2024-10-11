@@ -4,7 +4,7 @@
 CMD_PATH="$(cygpath -u "${PROGRAMFILES}\\Sublime Text\\subl.exe")"
 
 # Check if the command exists.
-if ! command -v "${CMD_PATH}" 2>&1 > /dev/null ; then
+if ! command -v "${CMD_PATH}" > /dev/null ; then
 	echo "Sublime text not installed at: ${CMD_PATH}"
   echo "Download from here: 'https://www.sublimetext.com/' or install using 'winget install -e --id SublimeHQ.SublimeText.4'."
 else
