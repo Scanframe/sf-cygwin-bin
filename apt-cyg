@@ -490,7 +490,7 @@ function apt-install {
     do
       if grep -q "^$package " /etc/setup/installed.db
       then
-        echo "Package '$package' is already installed, skipping"
+        #echo "Package '$package' is already installed, skipping"
         continue
       fi
       apt-cyg install --noscripts "${package}" || (( wr++ ))

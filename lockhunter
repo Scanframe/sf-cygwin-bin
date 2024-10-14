@@ -10,7 +10,7 @@ if [[ -d "${EXE_DIR}" ]] ; then
 	cygstart --directory="${EXE_DIR}" LockHunter.exe "$@"
 else
 	echo "Could not find a LockHunter installation!"
-	read -r -p "Install LockHunter using WinGet? [y/N] " response.
+	read -r -p "Install LockHunter using WinGet? [y/N] " response
 	if [[ "$response" =~ ^[yY]$ ]]; then
 		winget install --exact --id CrystalRich.LockHunter
 	fi
