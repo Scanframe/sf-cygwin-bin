@@ -1,3 +1,4 @@
+#!pwsh-shebang.sh
 # Make the script stop on the first error.
 $ErrorActionPreference = "Stop"
 # Imort the WPF framework.

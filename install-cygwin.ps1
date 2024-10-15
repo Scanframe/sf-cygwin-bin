@@ -1,3 +1,5 @@
+#!pwsh-shebang.sh
+
 param (
 	[switch]$debug
 )

@@ -1,3 +1,4 @@
+#!pwsh-shebang.sh
 [CmdletBinding()]
 param (
     [Alias("p")]

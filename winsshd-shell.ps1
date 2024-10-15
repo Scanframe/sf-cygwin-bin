@@ -1,3 +1,5 @@
+#!pwsh-shebang.sh
+
 ##
 ## This script is called when elevated.
 ##
