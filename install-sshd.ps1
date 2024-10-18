@@ -1,7 +1,7 @@
 #!pwsh-shebang.sh
 
 # Stop script on first error.
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Inquire"
 # Name of the sshd service in Windows.
 $sshdServiceName = "sshd"
 
@@ -32,8 +32,8 @@ function Install-Sshd-Service
 		$bashProfilePath = $env:USERPROFILE + [IO.Path]::DirectorySeparatorChar + ".profile"
 		# Notify...
 		Write-Host "Writing or updating: $bashProfilePath"
-		# Write the file content.
-		Set-Content -Path $bashProfilePath -Value @'
+		# Write the file content in needed Unix(LF) format.
+		Set-Content -Path $bashProfilePath -NoNewline -Value @'
 #
 # File for in Windows users directory 'C:\Users\<user-name>\.profile'
 #
@@ -44,6 +44,7 @@ export HOME="$(pwd)/cygwin"
 cd
 # Source the .bash_profile to have the same environment as Cygwin gets on the system itself.
 source .bash_profile
+# End of script.
 '@
 		# Check if this user has admin rights.
 		if (! (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
@@ -204,11 +205,11 @@ function Run-Elevated
 	}
 	else
 	{
-		$exitCode = Return Install-Sshd-Service
+		$exitCode = Install-Sshd-Service
 		if ($exitCode -ne 0)
 		{
 			Write-Host "`Installing service sshd failed`nPress any key to continue..."
-			[System.Console]::ReadKey() > $null;
+			[System.Console]::ReadKey() > $null
 		}
 	}
 }
@@ -218,7 +219,7 @@ $exitCode = Run-Elevated
 $service = Get-Service $sshdServiceName
 # Show the running service.
 Write-Host "$($service.DisplayName)($($service.Name)) = $($service.Status)"
-# Check if the service is running.
+# Check if the service is running and when not change the exit code.
 if ($exitCode -eq 0 -and $service.Status -ne "Running")
 {
 	$exitCode = 1
