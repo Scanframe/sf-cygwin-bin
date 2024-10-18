@@ -8,12 +8,6 @@ $sshdServiceName = "sshd"
 # Function wrapping the the installing of the sshd service using Cygwin bash prompt.
 function Install-Sshd-Service
 {
-	# Ask for installing.
-	$choice = ($Host.UI.PromptForChoice("Install sshd service using Cygwin", 'Are you sure you want to proceed?', ('&No', '&Yes'), 0))
-	if ($choice -eq 0 -or $choice -ne 1)
-	{
-		Return 1
-	}
 	# Only in version 7 the $IsWindows and $IsLinux exists.
 	if ($PSVersionTable.PSVersion.Major -lt 7)
 	{
@@ -78,22 +72,6 @@ source .bash_profile
 			# To make windows use this profile register the 'Cygwin.bat' batch file using an elevated powershell.
 			New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value $cygwinBatchFile -PropertyType String -Force
 		}
-		# Create the file if it doesn't exist
-		$sshdBatchfile = "$env:SystemDrive\cygwin64\sshd.bat"
-		if (Test-Path $sshdBatchfile)
-		{
-			Write-Host "SSH default shell '$cygwinBatchFile' already set."
-		}
-		else
-		{
-			Write-Host "SSH default shell is to be created..."
-			# Write the content to the file
-			Set-Content -Path $sshdBatchfile -Value @'
-@echo off
-set HOME=%HOMEDRIVE%%HOMEPATH%\cygwin
-call %~dp0Cygwin.bat
-'@
-		}
 		# Notify...
 		Write-Host "Adding firewall rule for VirtualBox VM."
 		foreach ($interface in Get-NetIPAddress | Where-Object { $_.InterfaceAlias -match "^Ethernet" -and $_.IPAddress -match "^192.168.56." })
@@ -114,7 +92,8 @@ call %~dp0Cygwin.bat
 		}
 		# Enable automatic startup for 'sshd' service.
 		Write-Host "Enable automatic startup and restarting service '$sshdServiceName'."
-		if (Set-Service $sshdServiceName -ErrorAction Ignore)
+		# Check if the service name exists.
+		if (Get-Service $sshdServiceName -ErrorAction Ignore)
 		{
 			Set-Service $sshdServiceName -startuptype automatic
 			Restart-Service $sshdServiceName
@@ -149,6 +128,13 @@ call %~dp0Cygwin.bat
 		# Loop through each line, find the match, and modify the next two lines.
 		for ($i = 0; $i -lt $fileContent.Count; $i++)
 		{
+			# Disable the default authorized keys file entry.
+			if ($fileContent[$i] -match "^AuthorizedKeysFile\s*\.ssh\/authorized_keys$")
+			{
+				$fileContent[$i] = "#" + $fileContent[$i]
+				# Set flag to write the modified content to file.
+				$flagModified = $True
+			}
 			# Check for the starting line and also if there is still a line after it.
 			if ($fileContent[$i] -match "^Match Group administrators" -and (($i + 1) -lt $fileContent.Count))
 			{
@@ -175,7 +161,7 @@ call %~dp0Cygwin.bat
 		if ($flagModified)
 		{
 			$fileContent | Set-Content -Path $sshdConfigFile
-			# Restart the service so it hase effect.
+			# Restart the service so the changes have effect.
 			Restart-Service $sshdServiceName
 		}
 		else
@@ -205,12 +191,35 @@ function Run-Elevated
 	}
 	else
 	{
+		Write-Host @"
+This script:
+  1) Adds firewall rules for any connections from 192.168.56.1 (VirtualBox host)
+     for all interfaces matching ip 192.168.56.*.
+  2) Adds the OpenSSH.Server capability (takes a long time to install).
+  3) Changes the default 'sshd_config' file to accomodate Cygwin.
+  4) Sets registry key 'DefaultShell' in 'HKLM:\SOFTWARE\OpenSSH'.
+  5) Sets 'sshd' service to start automatically.
+  6) Create the needed "%USERPROFILE%\.profile file to have the same
+     enviroment as the Cygwin shell on the system itself.
+
+To allow ssh connection having an ssh-agent and key, copy your public key to the
+"%USERPROFILE%\cygwin\.ssh\authorized_keys" file manually since 'ssh-copy-id' and
+'ssh-agent' forwarding are either working.
+
+"@
+		# Ask for installing.
+		$choice = ($Host.UI.PromptForChoice("Install sshd service using Cygwin", 'Are you sure you want to proceed?', ('&No', '&Yes'), 0))
+		if ($choice -eq 0 -or $choice -ne 1)
+		{
+			Return 0
+		}
 		$exitCode = Install-Sshd-Service
 		if ($exitCode -ne 0)
 		{
-			Write-Host "`Installing service sshd failed`nPress any key to continue..."
+			Write-Host "`Installing [$exitCode] service sshd failed`nPress any key to continue..."
 			[System.Console]::ReadKey() > $null
 		}
+		Return $exitCode
 	}
 }
 
