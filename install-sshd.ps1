@@ -90,6 +90,30 @@ source .bash_profile
 				New-NetFirewallRule -DisplayName $ruleName -Direction Inbound -Protocol Any -RemoteAddress $remoteIP -LocalAddress $interface.IPAddress -Action Allow -Profile Domain,Private,Public
 			}
 		}
+		# Open SSH port for inbound.
+		$ruleName = "Allow SSH on Port 22"
+		Write-Host "Rule name: $ruleName"
+		if (Get-NetFirewallRule -DisplayName $ruleName -ErrorAction Ignore)
+		{
+			Write-Host "Firewall rule '$( $ruleName )' already exists and is updated."
+			Set-NetFirewallRule -DisplayName $ruleName -Protocol TCP -LocalPort 22 -Action Allow
+		}
+		else
+		{
+			New-NetFirewallRule -DisplayName $ruleName -Name "Allow_SSH_Port_22" -Protocol TCP -LocalPort 22 -Action Allow
+		}
+		# Open ICPM packets for inbound.
+		$ruleName = "Allow_ICMP"
+		Write-Host "Rule name: $ruleName"
+		if (Get-NetFirewallRule -DisplayName $ruleName -ErrorAction Ignore)
+		{
+			Write-Host "Firewall rule '$( $ruleName )' already exists and is updated."
+			Set-NetFirewallRule -DisplayName $ruleName  -Protocol ICMPv4 -Action Allow
+		}
+		else
+		{
+			New-NetFirewallRule -DisplayName $ruleName -Name "Allow_ICMP" -Protocol ICMPv4 -Action Allow
+		}
 		# Enable automatic startup for 'sshd' service.
 		Write-Host "Enable automatic startup and restarting service '$sshdServiceName'."
 		# Check if the service name exists.

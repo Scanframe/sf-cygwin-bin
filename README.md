@@ -26,11 +26,19 @@ as well as to use Cygwin tools and applications within the Windows operating con
 
 The PowerShell script can be downloaded and executed using a single command.
 
-```powershell
+> **Note**: Execute script as a normal user. 
+
+From GitHub.
+
+```cmd
 powershell -Command "Invoke-Expression(Invoke-WebRequest 'https://raw.githubusercontent.com/Scanframe/sf-cygwin-bin/master/install-cygwin.ps1').Content"
 ```
 
-> **Note**: Execute script as a normal user. 
+From Windows file server address.
+
+```cmd
+powershell -Command "Invoke-Expression (Get-Content -raw '\\canberra\userdata\source\cygwin-bin\install-cygwin.ps1')"
+```
 
 ### Download script & run-it 
 

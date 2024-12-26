@@ -46,7 +46,7 @@ function DriveMounted()
 #
 function GetMountDrive()
 {
-	local index drives
+	local index drives opt
 	index=0
 	drives="klmnopxy"
 	for opt in $(declare -F | grep "^declare -f Mount_" | sed "s/^declare -f Mount_//"); do
@@ -83,10 +83,16 @@ else
 	echo "Creating: ${mounts_file}"
 	cat << 'EOF' > "${mounts_file}"
 
-# Named mounting function example
-function Mount_example
+# Named mounting function example ussing sshfs.
+function Mount_example1
 {
-	sshfs super@kubuntu: "$1:" -o "${OPTS},${OPTS_IDS},${OPTS_IPV4}" ;
+	sshfs "${USERNAME}@server:home-subdir" "$1:" -o "${OPTS},${OPTS_IDS},${OPTS_IPV4}" ;
+}
+
+# Named mounting function example using net use.
+function Mount_example2
+{
+	net use /user:"${USERNAME}" "$1:" '\\server\share\subdir' 
 }
 
 EOF
@@ -150,9 +156,19 @@ function DirectoryFuseUnmount
 	if [[ $? -eq 0 ]]; then
 		WriteLog "Already unmounted: ${dir}"
 	else	
-		WriteLog "Unmounting: ${dir}"
-		fusermount -u "${dir}" > /dev/null
+		if ! fusermount -u "${dir}" 2>/dev/null; then
+			if net use "${drive}:" /delete 2>/dev/null; then
+				return 0
+			else	
+				WriteLog "Unmounting failed of: ${dir}"
+				return 1
+			fi 
+		else	
+				WriteLog "Unmounting failed of: ${dir}"
+			return 1
+		fi
 	fi
+	return 0
 }
 
 	
@@ -161,7 +177,7 @@ if [[ "$1" == "show" ]] ; then
 	ShowMounted
 	exit 0
 fi
-	
+
 # Check what to mount or unmount.
 if type "Mount_$2" &>/dev/null ; then
 	if [[ "$1" = "mount" ]]; then
