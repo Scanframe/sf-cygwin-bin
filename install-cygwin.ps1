@@ -113,7 +113,7 @@ function Cygwin-WebInstall
 			"--upgrade-also",
 			"--local-package-dir `"$installDir\pkgs`"",
 			"--packages $( $packages -join "," )",
-			"--site http://ftp.snt.utwente.nl/pub/software/cygwin/"
+			"--site https://ftp.snt.utwente.nl/pub/software/cygwin/"
 		)
 		# The '-PassThru' options is needed to make it return the 'System.Diagnostics.Process' object.
 		$process = Start-Process -Wait -PassThru -FilePath $setupExe -ArgumentList "$( $arguments -join " " )"
@@ -470,18 +470,8 @@ if ($choice -ne 0)
 	else
 	{
 		$retval = WinGet-InstallPackage "WinFsp.WinFsp"
-	}<#
-	# The notepad++ shell script installs it when not present.
-	if ($retval -and $choice -eq 2)
-	{
-		$retval = WinGet-InstallPackage -update "Notepad++.Notepad++"
 	}
-	else
-	{
-		$retval = WinGet-InstallPackage "Notepad++.Notepad++"
-	}
-#>
-	#
+	# Check install result.
 	if (-not $retval)
 	{
 		Write-Error "Failed installing!"
