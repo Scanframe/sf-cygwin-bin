@@ -462,7 +462,15 @@ if ($choice -ne 0)
 	{
 		$retval = WindowsTerminal-CygwinProfile
 	}
-<#
+	# The WinFsp.WinFsp shell script installs it when not present.
+	if ($retval -and $choice -eq 2)
+	{
+		$retval = WinGet-InstallPackage -update "WinFsp.WinFsp"
+	}
+	else
+	{
+		$retval = WinGet-InstallPackage "WinFsp.WinFsp"
+	}<#
 	# The notepad++ shell script installs it when not present.
 	if ($retval -and $choice -eq 2)
 	{
