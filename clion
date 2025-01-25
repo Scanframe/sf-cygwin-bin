@@ -9,6 +9,11 @@ source "${script_dir}/inc/WriteLog.sh"
 # Check if CLion is installed in the users 'lib' directory.
 clion_bin_dir="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2>/dev/null)"
 
+if [[ -z "${clion_bin_dir}" ]]; then
+	# Check if CLion is installed in one of the drives.
+	clion_bin_dir="$(ls -d "$(cygpath -u /cygdrive/?/clion/bin 2>/dev/null)")"
+fi	
+
 # Check if CLion is installed in application directory.
 if [[ -z "${clion_bin_dir}" ]]; then
 	clion_bin_dir="$(ls -d $(cygpath -u "${SYSTEMDRIVE}")/Program\ Files*/JetBrains/CLion*/bin 2> /dev/null)"
