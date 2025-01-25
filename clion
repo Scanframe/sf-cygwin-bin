@@ -1,27 +1,30 @@
 #!/bin/bash
 
 # Get the script directory.
-SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+script_dir="$(dirname "${BASH_SOURCE[0]}")"
+
 # Include WriteLog function.
-source "${SCRIPT_DIR}/inc/WriteLog.sh"
+source "${script_dir}/inc/WriteLog.sh"
 
 # Check if CLion is installed in the users 'lib' directory.
-CLION_BIN_DIR="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2> /dev/null)"
+clion_bin_dir="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion"*/bin 2>/dev/null)"
+
 # Check if CLion is installed in application directory.
-if [[ -n "${CLION_BIN_DIR}" ]]; then
-	CLION_BIN_DIR="$(ls -d "$(cygpath -u "${ProgramW6432}")"*/JetBrains/CLion*/bin 2> /dev/null)"
+if [[ -z "${clion_bin_dir}" ]]; then
+	clion_bin_dir="$(ls -d $(cygpath -u "${SYSTEMDRIVE}")/Program\ Files*/JetBrains/CLion*/bin 2> /dev/null)"
 else
 	# Check if CLion is installed on a drive.
-	CLION_BIN_DIR="$(ls -d /cygdrive/*/clion/bin | head -n 1)"
+	clion_bin_dir="$(ls -d /cygdrive/*/clion/bin 2>/dev/null | head -n 1)"
 fi
+
 # Check if the CLion directory exists was found.
-if [[ -d "${CLION_BIN_DIR}" ]] ; then
-	cygstart --directory="${CLION_BIN_DIR}" clion64.exe "$@"
-else
+if [[ -z "${clion_bin_dir}" ]] ; then
 	WriteLog "Could not find a CLion installation!"
 	read -r -p "Install CLion using WinGet? [y/N] " response
 	if [[ "$response" =~ ^[yY]$ ]]; then
 		winget install --disable-interactivity --accept-source-agreements --accept-package-agreements --exact --id "JetBrains.CLion"
 	fi
 	exit 1
+else
+	cygstart --directory="${clion_bin_dir}" clion64.exe "$@"
 fi
