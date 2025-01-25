@@ -4,7 +4,7 @@
 # Get the bash script directory.
 #SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 # Set the directory the local QT root expected.
-LOCAL_QT_ROOT="${HOME}/lib/Qt"
+local_qt_root="${HOME}/lib/qt"
 
 # Writes to stderr.
 #
@@ -17,25 +17,24 @@ function WriteLog()
 #
 function GetLocalQtDir()
 {
-	local LocalQtDir=""
+	local local_qt_dir=""
 	# Check is the Qt install can be found.
-	if [[ ! -d "${LOCAL_QT_ROOT}" ]] ; then
-		#WriteLog "Qt install directory or symbolic link '${LOCAL_QT_ROOT}' was not found!"
+	if [[ ! -d "${local_qt_root}/" ]] ; then
+		#WriteLog "Qt install directory or symbolic link '${local_qt_root}' was not found!"
 		exit 1
 	fi
 	# Find the newest Qt library installed.
-	LocalQtDir="$(/usr/bin/find "${LOCAL_QT_ROOT}/" -maxdepth 1 -type d -regex ".*\/Qt\/[56].[0-9]+.[0-9]+$" | sort --reverse --version-sort | head -n 1)"
-	if [[ -z "${LocalQtDir}" ]] ; then
+	local_qt_dir="$(/usr/bin/find "${local_qt_root}/" -maxdepth 1 -type d -regex ".*\/qt\/w64-$(uname -m)\/[0-9]+.[0-9]+.[0-9]+$" | sort --reverse --version-sort | head -n 1)"
+	if [[ -z "${local_qt_dir}" ]] ; then
 		WriteLog "Could not find local installed Qt directory."
 		exit 1
 	fi
 	
 	if [[ "$(uname -s)" == "CYGWIN_NT"* ]]; then
-#		LocalQtDir="$(cygpath --mixed "${LocalQtDir}")"
-		LocalQtDir="$(realpath "${LocalQtDir}")"
+		local_qt_dir="$(realpath "${local_qt_dir}")"
 	fi
 
-	echo -n "${LocalQtDir}"
+	echo -n "${local_qt_dir}"
 }
 
 
