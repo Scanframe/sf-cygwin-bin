@@ -12,7 +12,7 @@ Usage: $0 <directory>
 fi
 
 target_dir="$1"
-magic="-#symlink-rename#"
+magic="-#symlink#"
 
 # Check if the directory exists.
 if [[ ! -d "${target_dir}" ]]; then 
@@ -30,8 +30,12 @@ while read -r symlink; do
 	dest="$(readlink "${symlink}")"
 	echo "Destination: ${dest}"
 	CYGWIN=winsymlinks:native ln -rs "${dest}" "${symlink}${magic}"
-	# Finally replace the original symlink.
+	# Finally replace the original symlink by renaming the original first.
+	mv "${symlink}" "${symlink}${magic}org"
+	# Renaming the new created one to the actual needed name.
 	mv "${symlink}${magic}" "${symlink}"
+	# Last step remove the renamed original one.
+	rm "${symlink}${magic}org" 
 done < <(find ./ -maxdepth 1 -type l)
 popd >/dev/null
 
