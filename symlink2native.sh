@@ -20,6 +20,20 @@ if [[ ! -d "${target_dir}" ]]; then
 	exit 1
 fi 
 
+# Check if developer mode is enabled.
+if [[ "$(reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense |
+	grep AllowDevelopmentWithoutDevLicense | awk '{print $3}')" != "0x1" ]]; then 
+	echo "Developer mode is not enabled in the Windows Settings."
+	if false; then
+		# Open the the Windows settings at the correct page.
+		powershell -c "start ms-settings:developers"
+		exit 1
+	else
+		# Set the registry for enabling the developers mode for allowing creation of symlinks.
+		sudo reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense /t REG_DWORD /d 1 /f
+	fi
+fi	
+
 pushd "${target_dir}" >/dev/null
 while read -r symlink; do
 	if fsutil reparsepoint query "$(cygpath -w "$(dirname "${symlink}")")\\$(basename "${symlink}")" | 
