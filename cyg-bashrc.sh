@@ -137,8 +137,9 @@ if [[ "${SSH_TTY}" != "windows-pty" ]]; then
 	# Load the ssh-agent and default key.
 	source load-ssh-agent.sh
 
-	# Change to the initial directory using 'INITIAL_DIR' variable set
-	# from 'PWD' in a modified in 'C:\cygwin64\Cygwin.bat' file.
+	# Add the following line in 'C:\cygwin64\Cygwin.bat' file.
+	#   set INITIAL_DIR=%cd%
+	#
 	cd "${INITIAL_DIR}"
 	# Remove the environment variable.
 	unset INITIAL_DIR
