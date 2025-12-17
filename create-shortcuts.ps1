@@ -39,24 +39,24 @@ $destDir = Get-DestinationFolder
 # Create shortcut
 function Create-Shortcut([string] $exePath, [string] $arguments, [string] $target, [string] $iconPath)
 {
-    #New-Object : Creates an instance of a Microsoft .NET Framework or COM object.
-    #-ComObject WScript.Shell: This creates an instance of the COM object that represents the WScript.Shell for invoke CreateShortCut
-    $ws = New-Object -ComObject WScript.Shell
-    # Create the shortcut and fill in the properties.
-    $sc = $ws.CreateShortcut($target)
-		# Start in minimized style.
-		$sc.WindowStyle = 7
-    $sc.TargetPath = $exePath
-    $sc.Arguments = $arguments
-    $sc.IconLocation = $iconPath
-    $sc.Save()
- }
+	#New-Object : Creates an instance of a Microsoft .NET Framework or COM object.
+	#-ComObject WScript.Shell: This creates an instance of the COM object that represents the WScript.Shell for invoke CreateShortCut
+	$ws = New-Object -ComObject WScript.Shell
+	# Create the shortcut and fill in the properties.
+	$sc = $ws.CreateShortcut($target)
+	# Start in minimized style.
+	$sc.WindowStyle = 7
+	$sc.TargetPath = $exePath
+	$sc.Arguments = $arguments
+	$sc.IconLocation = $iconPath
+	$sc.Save()
+}
 
 # Create Linux-VM shortcut
 function Create-Bash-Shortcut([string] $name, [string] $binScript, [string] $iconFilename, [string] $targetDirectory)
 {
-	Write-Host "${targetDirectory}\$($name).lnk"
-	Create-Shortcut """%USERPROFILE%\cygwin\bin\run-bash-script.cmd""" "${binScript}" "${targetDirectory}\$($name).lnk" "${PSScriptRoot}\img\$($iconFilename)"
+	Write-Host "${targetDirectory}\$( $name ).lnk"
+	Create-Shortcut """%USERPROFILE%\cygwin\bin\run-bash-script.cmd""" "${binScript}" "${targetDirectory}\$( $name ).lnk" "${PSScriptRoot}\img\$( $iconFilename )"
 }
 
 # Create a web application shortcut.
@@ -68,7 +68,7 @@ function Create-WebApp-Shortcut([string] $name, [string] $appUrl, [string] $icon
 	{
 		$browserBin = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
 	}
-	Create-Shortcut $browserBin "--app=""$($appUrl)""" "${targetDirectory}\$($name).lnk" "${PSScriptRoot}\img\$($iconFilename)"
+	Create-Shortcut $browserBin "--app=""$( $appUrl )""" "${targetDirectory}\$( $name ).lnk" "${PSScriptRoot}\img\$( $iconFilename )"
 }
 
 # Create the main form
@@ -99,9 +99,9 @@ $tabWebApps.Text = "Web Apps"
 $tabControl.Controls.Add($tabWebApps)
 
 # Offset between button positions.
-$btnPosTopOfs=5
-$btnPosOfs=30
-$btnPosIndex=0
+$btnPosTopOfs = 5
+$btnPosOfs = 30
+$btnPosIndex = 0
 
 ##
 ## Function to get the vertical position for a button.

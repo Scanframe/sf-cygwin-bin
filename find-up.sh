@@ -1,17 +1,15 @@
 #!/bin/bash
 
-# Writes to stderr.
-#
-function WriteLog
-{
-	>&2 echo "$@"
-}
+# Get the script directory.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Include WriteLog function.
+source "${script_dir}/inc/WriteLog.sh"
 
 # Prints the help.
 #
-function ShowHelp
+function show_help
 {
-	echo "Usage: ${0} [options] <name>"
+	echo "Usage: $(basename "${0}") [options] <name>"
 	echo "  Find directory or file equal to the passed name."
 	echo "  Options:"
 	echo "    -t|--type <d|f>: File or directory."
@@ -20,19 +18,19 @@ function ShowHelp
 # Type 'd' for directory
 type=""
 # Parse options.
-TEMP=$(getopt -o 'ht:' --long 'help,type:' -n "$(basename "${0}")" -- "$@")
+temp=$(getopt -o 'ht:' --long 'help,type:' -n "$(basename "${0}")" -- "$@")
 # shellcheck disable=SC2181
 if [[ $? -ne 0 ]]; then
-	ShowHelp
+	show_help
 	exit 1
 fi
-eval set -- "$TEMP"
-unset TEMP
+eval set -- "$temp"
+unset temp
 while true; do
 	case "$1" in
 
 	-h | --help)
-		ShowHelp
+		show_help
 		exit 0
 		;;
 
@@ -63,7 +61,7 @@ done
 name="${argument[0]}"
 # When no argument passed show help.
 if [[ -z "${name}" ]]; then
-	ShowHelp
+	show_help
 	exit 0
 fi
 # Get the current working directory.
