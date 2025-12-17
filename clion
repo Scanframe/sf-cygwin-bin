@@ -11,7 +11,7 @@ clion_bin_dir="$(ls -d "$(cygpath -u "$(cygpath -u "${USERPROFILE}")")/lib/CLion
 
 if [[ -z "${clion_bin_dir}" ]]; then
 	# Check if CLion is installed in one of the drives.
-	clion_bin_dir="$(ls -d "$(cygpath -u /cygdrive/?/clion/bin 2>/dev/null)")"
+	clion_bin_dir="$(ls -d "$(cygpath -u /cygdrive/?/JetBrains/clion/bin 2>/dev/null)" 2>/dev/null)"
 fi	
 
 # Check if CLion is installed in application directory.
@@ -19,10 +19,10 @@ if [[ -z "${clion_bin_dir}" ]]; then
 	clion_bin_dir="$(ls -d $(cygpath -u "${SYSTEMDRIVE}")/Program\ Files*/JetBrains/CLion*/bin 2> /dev/null)"
 else
 	# Check if CLion is installed on a drive.
-	clion_bin_dir="$(ls -d /cygdrive/*/clion/bin 2>/dev/null | head -n 1)"
+	clion_bin_dir="$(ls -d /cygdrive/*/JetBrains/clion/bin 2>/dev/null | head -n 1)"
 fi
 
-# Check if the CLion directory exists was found.
+# Check if the CLion directory was found.
 if [[ -z "${clion_bin_dir}" ]] ; then
 	WriteLog "Could not find a CLion installation!"
 	read -r -p "Install CLion using WinGet? [y/N] " response

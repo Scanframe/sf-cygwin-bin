@@ -36,6 +36,9 @@ case "${ext}" in
 	so)
 		nm --demangle --dynamic --defined-only --extern-only "${1}" | sort -ru | sed -e '/^[0-9a-f]* W .*$/d'
 		;;
+	dll)
+		nm  --extern-only --defined-only --demangle "${1}" | grep -e '^[0-9a-f]* T ' | sort -ru | sed 's/^[0-9a-fA-F]\+ T //g'
+		;;
 	bin)
 		nm --demangle --dynamic --defined-only --extern-only "${1}" | sort -ru | sed -e '/^[0-9a-f]* W .*$/d'
 		;;

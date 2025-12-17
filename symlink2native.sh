@@ -21,8 +21,8 @@ if [[ ! -d "${target_dir}" ]]; then
 fi 
 
 # Check if developer mode is enabled.
-if [[ "$(reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense |
-	grep AllowDevelopmentWithoutDevLicense | awk '{print $3}')" != "0x1" ]]; then 
+if ! reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense | 
+	grep --perl-regexp --quiet  'AllowDevelopmentWithoutDevLicense\s*REG_DWORD\s*0x1'; then 
 	echo "Developer mode is not enabled in the Windows Settings."
 	if false; then
 		# Open the the Windows settings at the correct page.
