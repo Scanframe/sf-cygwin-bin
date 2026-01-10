@@ -206,6 +206,8 @@ msvc_packages = [
   f"microsoft.vc.{msvc_ver}.crt.source.base",
   f"microsoft.vc.{msvc_ver}.asan.headers.base",
   f"microsoft.vc.{msvc_ver}.pgo.headers.base",
+  f"microsoft.vc.{msvc_ver}.atl.headers.base",
+  f"microsoft.vc.{msvc_ver}.atl.{target}.base"
 ]
 
 for target in targets:
@@ -379,8 +381,8 @@ set VCToolsInstallDir=%~dp0VC\Tools\MSVC\{msvcv}\
 set WindowsSdkBinPath=%~dp0Windows Kits\10\bin\
 
 set PATH=%~dp0VC\Tools\MSVC\{msvcv}\bin\Host{host}\{target};%~dp0Windows Kits\10\bin\{sdkv}\{host};%~dp0Windows Kits\10\bin\{sdkv}\{host}\ucrt;%PATH%
-set INCLUDE=%~dp0VC\Tools\MSVC\{msvcv}\include;%~dp0Windows Kits\10\Include\{sdkv}\ucrt;%~dp0Windows Kits\10\Include\{sdkv}\shared;%~dp0Windows Kits\10\Include\{sdkv}\um;%~dp0Windows Kits\10\Include\{sdkv}\winrt;%~dp0Windows Kits\10\Include\{sdkv}\cppwinrt
-set LIB=%~dp0VC\Tools\MSVC\{msvcv}\lib\{target};%~dp0Windows Kits\10\Lib\{sdkv}\ucrt\{target};%~dp0Windows Kits\10\Lib\{sdkv}\um\{target}
+set INCLUDE=%~dp0VC\Tools\MSVC\{msvcv}\include;%~dp0VC\Tools\MSVC\{msvcv}\atlmfc\include;%~dp0Windows Kits\10\Include\{sdkv}\ucrt;%~dp0Windows Kits\10\Include\{sdkv}\shared;%~dp0Windows Kits\10\Include\{sdkv}\um;%~dp0Windows Kits\10\Include\{sdkv}\winrt;%~dp0Windows Kits\10\Include\{sdkv}\cppwinrt
+set LIB=%~dp0VC\Tools\MSVC\{msvcv}\lib\{target};%~dp0VC\Tools\MSVC\{msvcv}\atlmfc\lib\{target};%~dp0Windows Kits\10\Lib\{sdkv}\ucrt\{target};%~dp0Windows Kits\10\Lib\{sdkv}\um\{target}
 """
   (OUTPUT / f"setup_{target}.bat").write_text(SETUP)
 

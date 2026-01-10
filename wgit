@@ -1,0 +1,3 @@
+#!/bin/bash
+
+'/cygdrive/c/Program Files/Git/cmd/git.exe' "${@}"
